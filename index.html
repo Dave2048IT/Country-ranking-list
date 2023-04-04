@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Country Ranking List</title>
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.css">
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/zeroclipboard/2.3.0/ZeroClipboard.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js"></script>
+	</head>
+	<body>
+		<noscript>
+			<div class="warnung">
+				<h3>Please use a good Browser or download "HTML Viewer Q" to use JavaScript</h3>
+			</div>
+		</noscript>
+		<h1>Your own
+		<br>Country ranking list 😉</h1>
+		
+		<p>Local Storage:</p>
+		<div id="storage_btns">
+			<button type="button" onclick="loadScores()">Load</button>
+			<button type="button" onclick="saveScores()">Save</button>
+			<button type="button" onclick="resetScores()">Reset</button>
+		</div>
+		<br><div>All resources were fully loaded in <span id="reqMS">---</span> ms</div>
+		<br><div>Download-Speed from CDN: <span id="downMb">---</span> Mbit/s</div>
+		<br>
+
+		<div id="myMenu"></div>
+		<div id="country_text1">
+			The Country from your band (whatever):
+			<input class="wide" id="country_put" type="text" />
+		</div>
+		<button type="button" onclick="calc()">Calculate</button>
+		<button id="btnTop10" onclick="copyToClipboard()">Copy Top 10</button>
+		<div id="ranking"></div>
+		<p>
+		<div id="end_text">
+		<span id="duration"></span></div>
+		<p>Provided by countryflags.com - part of ProFlags BV</p>
+		<p>Coded and designed by <br>David Schüppel @ 27.02. - 05.03.
+			<br><br>Last Update: 4.4.2023, 13:06:00
+		</p>
+		<script src="js/countries.js"></script>
+		<script src="js/script.js"></script>
+	</body>
+</html>

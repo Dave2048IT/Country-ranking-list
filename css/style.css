@@ -1,0 +1,83 @@
+body, input {
+	background: linear-gradient(180deg, hsl(323, 100%, 23%), hsl(204, 100%, 20%));
+	color: white;
+	text-shadow: 2px 2px 4px black;
+	font-size: 2em;
+	font-family: Helvetica;
+	text-align: center;
+}
+textarea {
+	font-family: Helvetica;
+	width: 64%;
+	height: 64px;
+	border-radius: 10px;
+}
+input, button {
+	font-size: 1em;
+	margin: 5px 0;
+}
+input {
+	width: 11rem;
+	background: hsla(0, 0%, 0%, 0.5);
+	border: 1px solid aqua;
+	border-radius: 20px;
+}
+input[type=number] {
+	width: 5rem;
+}
+.ctryDivs {
+	background: no-repeat scroll center / contain;
+}
+#ranking_old {
+	text-align: right;
+	margin-right: 50%;
+	transform: translate(200px);
+}
+#myMenu {
+	float: left;
+}
+#ranking span:nth-child(1) {
+	color: hsl(45, 100%, 53%);
+}
+#ranking span:nth-child(3) {
+	color: hsl(0, 0%, 83%);
+}
+#ranking span:nth-child(5) {
+	color: hsl(27, 60%, 50%);
+}
+#ranking span:nth-child(even) {
+	color: lightcoral;
+}
+.tickBtns {
+	width: 20%;
+	margin: 0 5%;
+	font-size: 3rem;
+	touch-action: manipulation;
+}
+p.inticks {
+	margin: 0;
+}
+.minus {
+	border-radius: 0 2rem;
+	background-color: hsla(0, 100%, 50%, 0.25);
+}
+.plus {
+	border-radius: 2rem 0;
+	background-color: hsla(120, 100%, 50%, 0.25)
+}
+.warnung {
+	position: fixed;
+	top: 0;
+	left: 0;
+	background-color: darkgoldenrod;
+	padding: 10px;
+	z-index: 9999;
+	width: 100%;
+	text-align: center;
+}
+.swal2-html-container, .swal2-footer {
+	color: white !important;
+}
+.swal2-input-modified {
+	margin: 10px auto !important;
+}

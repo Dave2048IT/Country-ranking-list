@@ -1,0 +1,2 @@
+var countries = ["Germany", "USA", "Japan", "Sweden", "Poland", "Turkey", "Austria", "Pakistan",
+					"Netherlands", "Czech Republic", "Lithuania", "Spain", "Norway", "Taiwan", "Portugal", "Puerto Rico"];
