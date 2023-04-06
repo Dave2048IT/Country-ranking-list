@@ -8,14 +8,13 @@ window.addEventListener('load', async () => {
 		reqMS.textContent = Math.floor(pageLoadTimeMS);
 
 		try {
-			const speed = await testConnectionSpeed.test();
-			console.log(speed);
+		const speed = await testConnectionSpeed.test();
+		console.log(speed);
 		} catch (error) {
-			console.error(error);
+		console.error(error);
 		}
 	}, 500);
 });
-
 
 const testConnectionSpeed = {
 	sourceAddr: "https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js",
@@ -39,61 +38,81 @@ const testConnectionSpeed = {
 	}
 };
 
-function calc() {
-	const ms = performance.now();
-	const ordinalEnds = ["st", "nd", "rd"];
-	const pts = [12, 10, 8, 7, 6, 5, 4, 3, 2, 1];
-	const clones = [];
-	let myText = "";
-	let cloned = false;
-	
-	Array.from({ length: countryCount }).forEach((_, i) => {
-		ctry_scores[i][0] = window[`name${i}`].value;
-		ctry_scores[i][1] = parseInt(window[`score${i}`].value);
-	});
-	
-	const sorted = [...ctry_scores].sort((a, b) => b[1] - a[1]);
-	const ranks = sorted.map(v => ctry_scores.indexOf(v) + 1);
-	
-	console.log("sorted", sorted);
-	console.log("ranks", ranks);
-	
-	sorted.forEach((country, i) => {
-		if (!cloned && i < countryCount - 1 && country[1] == sorted[i + 1][1]) {
-			clones.push(ranks[i], ranks[i + 1]);
+function rankCountries() {
+	console.time("rankCountries");
+
+	const myNameInputs = document.querySelectorAll(".myNameInputs");
+	const myScoreInputs = document.querySelectorAll(".myScoreInputs");
+	const ranking = document.getElementById("ranking");
+
+	const countries = [];
+	for (let [i, input] of myNameInputs.entries()) {
+		const { value: name } = input;
+		const { value: score } = myScoreInputs[i];
+		if (name && !isNaN(score)) {
+			countries.push({ name, score: parseInt(score) });
 		}
-		if (i === 10) {
-			myText += "<br>";
-		}
-		myText += `<span>${i + 1}${(i < 3 ? ordinalEnds[i] : "th")} (${(pts[i] || 0)})\t: ${country[0]} ->\t ${country[1]} P.</span><br>`;
-	});
-	
-	if (clones.length > 0) {
-		const uniqueClones = [...new Set(clones)].sort((a, b) => a - b).join(", ");
+	}
+	const original = [...countries];
+
+	const duplicates = findDuplicateIndexes(countries);
+
+	const rankedCountries = countries.sort((a, b) => b.score - a.score)
+		.map(({ name, score }, i) =>
+		`<span>${i + 1}${getOrdinal(i + 1)}: ${name} (${score}) -> ${i < 10 ? `${[12, 10, 8, 7, 6, 5, 4, 3, 2, 1][i]}` : 0} P.</span>`
+	);
+	rankedCountries.splice(10, 0, null);
+
+	if (rankedCountries[rankedCountries.length - 2].score === 0) {
 		Swal.fire({
-			title: "Countries with same score",
-			text: uniqueClones,
-			icon: "warning",
-			background: "indianred",
-			didOpen: () => {
-				document.querySelector('.swal2-title').style.color = "white";
-			}
+		title: "Please give points to all countries except yours.",
+		icon: "warning",
+		background: "darkgoldenrod",
+		didOpen: () => {
+			document.querySelector(".swal2-title").style.color = "white";
+		},
 		});
 	}
 
-	if (sorted[countryCount - 2][1] === 0) {
+	if (duplicates.length > 0) {
+		const indexes = duplicates
+			.map((index) => index + 1).join(", ");
 		Swal.fire({
-			title: "Please give points to all countries except yours.",
-			icon: "warning",
-			background: "darkgoldenrod",
-			didOpen: () => {
-				document.querySelector('.swal2-title').style.color = "white";
-			}
+		title: "Warning",
+		text: `Duplicate scores found for indexes: ${indexes}`,
+		icon: "warning",
+		background: "indianred",
 		});
 	}
-	
+
+	const myText = rankedCountries.join("<br>");
 	ranking.innerHTML = myText;
-	duration.innerText = `In ${(performance.now() - ms).toFixed(1)} ms`;
+
+	console.timeEnd("rankCountries");
+	return original;
+}
+
+function findDuplicateIndexes(arr) {
+	const duplicates = [];
+	
+	for (let i = 0; i < arr.length; i++) {
+		for (let j = i + 1; j < arr.length; j++) {
+			if (arr[i].score === arr[j].score) { // prüfen, ob Elemente gleich sind
+				duplicates.push(i);
+				duplicates.push(j);
+			}
+		}
+	}
+	// entfernen Sie Duplikate aus dem Ergebnisarray und sortieren Sie es aufsteigend
+	return [...new Set(duplicates)].sort((a, b) => a - b);
+}
+
+function getOrdinal(n) {
+	return (n === 11 || n === 12 || n === 13) ? "th" :
+		(n % 10 === 1) ? "st" :
+		(n % 10 === 2) ? "nd" :
+		(n % 10 === 3) ? "rd" :
+		"th";
 }
 
 function hasDuplicates(array) {
@@ -108,6 +127,7 @@ function myCreateCountry(i) {
 	
 	const nameInput = createInputElement('name', i, 'text', countries[i]);
 	const scoreInput = createInputElement('score', i, 'number', 0, 10);
+	nameInput.classList.add('myNameInputs');
 	scoreInput.classList.add('myScoreInputs');
 
 	const plusBtn = createButtonElement('plus', i, '↑');
@@ -166,9 +186,12 @@ myMenu.addEventListener('click', function(e) {
 });
 
 function saveScores() {
-	calc();
 	try {
-		localStorage.setItem("ctry_scores", JSON.stringify(ctry_scores));
+		let countries = rankCountries();
+		localStorage.setItem("ctry_scores", JSON.stringify(
+			countries.map(item => ({name: item.name, score: item.score}))
+		));
+		
 		Swal.fire({
 			title: "Score saved",
 			text: "Your scores have been saved to local storage.",
@@ -197,33 +220,28 @@ function loadScores() {
 
 		if (!storedScores) {
 			Swal.fire({
-			title: "No scores found",
-			text: "There are no scores to load from local storage.",
-			icon: "warning",
-			didOpen: () => {
-				document.querySelector('.swal2-popup').style.backgroundColor = "darkred";
-				document.querySelector('.swal2-title').style.color = "white";
-			}
+				title: "No scores found",
+				text: "There are no scores to load from local storage.",
+				icon: "warning",
+				didOpen: setPopupStyle("darkred")
 			});
 
 			return null;
 		}
 
 		for (let i = 0; i < countryCount; i++) {
-			window[`name${i}`].value = storedScores[i]?.[0] || "";
-			window[`score${i}`].value = storedScores[i]?.[1] || 0;
+			const nameInput = window["name" + i];
+			const scoreInput = window["score" + i];
+			const {name: nameValue = "", score: scoreValue = 0} = storedScores[i] || {};
+			nameInput.value = nameValue;
+			scoreInput.value = scoreValue;
 		}
 
 		Swal.fire({
 			title: "Scores loaded successfully",
 			icon: "success",
-			didOpen: () => {
-				document.querySelector('.swal2-popup').style.backgroundColor = "blue";
-				document.querySelector('.swal2-title').style.color = "white";
-			}
+			didOpen: setPopupStyle("blue")
 		});
-
-		calc();
 
 		return storedScores;
 	} catch (error) {
@@ -231,14 +249,18 @@ function loadScores() {
 			title: "Failed to load scores",
 			text: error.message,
 			icon: "error",
-			didOpen: () => {
-				document.querySelector('.swal2-popup').style.backgroundColor = "darkred";
-				document.querySelector('.swal2-title').style.color = "white";
-			}
+			didOpen: setPopupStyle("darkred")
 		});
 
 		return null;
 	}
+}
+
+function setPopupStyle(bgColor) {
+	return () => {
+		document.querySelector(".swal2-popup").style.backgroundColor = bgColor;
+		document.querySelector(".swal2-title").style.color = "white";
+	};
 }
 
 function resetScores() {
@@ -281,9 +303,9 @@ function setFallbackZeroClipboard(text) {
 	if (ZeroClipboard.isFlashUnusable()) {
 		Swal.fire({
 			icon: 'error',
-			title: 'Copying not possible',
-			text: 'Because Flash is not installed or disabled in your browser...',
-			footer: 'But anyway. Please try again. If in doubt, hold and drag the text and select Copy.',
+			title: 'Please try again',
+			text: 'Flash is not installed or disabled in your browser...',
+			footer: 'But anyway. If in doubt, hold and drag the text and select Copy.',
 		});
 	}
 
