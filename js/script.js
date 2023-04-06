@@ -39,7 +39,7 @@ const testConnectionSpeed = {
 };
 
 function rankCountries() {
-	console.time("rankCountries");
+	const ms = performance.now();
 
 	const myNameInputs = document.querySelectorAll(".myNameInputs");
 	const myScoreInputs = document.querySelectorAll(".myScoreInputs");
@@ -87,8 +87,8 @@ function rankCountries() {
 
 	const myText = rankedCountries.join("<br>");
 	ranking.innerHTML = myText;
-
-	console.timeEnd("rankCountries");
+		
+	duration.innerText = `In ${(performance.now() - ms).toFixed(1)} ms`;
 	return original;
 }
 
