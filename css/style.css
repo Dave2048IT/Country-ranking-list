@@ -36,13 +36,13 @@ input[type=number] {
 #myMenu {
 	float: left;
 }
-#ranking span:nth-child(1) {
+#ranking span:nth-child(3) {
 	color: hsl(45, 100%, 53%);
 }
-#ranking span:nth-child(3) {
+#ranking span:nth-child(5) {
 	color: hsl(0, 0%, 83%);
 }
-#ranking span:nth-child(5) {
+#ranking span:nth-child(7) {
 	color: hsl(27, 60%, 50%);
 }
 #ranking span:nth-child(even) {
@@ -75,9 +75,16 @@ p.inticks {
 	width: 100%;
 	text-align: center;
 }
+.swal2-input-modified {
+	margin: 10px auto !important;
+}
 .swal2-html-container, .swal2-footer {
 	color: white !important;
 }
-.swal2-input-modified {
-	margin: 10px auto !important;
+.swal2-validation-message {
+	color: white !important;
+	background-color: darkred !important;
+}
+sup {
+	font-size: 0.7em;
 }

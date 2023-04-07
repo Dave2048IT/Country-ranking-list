@@ -16,6 +16,12 @@ window.addEventListener('load', async () => {
 	}, 500);
 });
 
+window.addEventListener("beforeunload", function (event) {
+	if (!("ctry_scores" in localStorage)) {
+		event.returnValue = "You have unsaved changes. If you leave now, your progress will be lost. Are you sure you want to leave?";
+	}
+});
+
 const testConnectionSpeed = {
 	sourceAddr: "https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js",
 	downloadSize: 18501,
@@ -24,7 +30,7 @@ const testConnectionSpeed = {
 	test: async function() {
 		try {
 			const startTime = performance.now();
-			const response = await fetch(this.sourceAddr, { method: 'HEAD', mode: 'no-cors' });
+			const response = await fetch(this.sourceAddr, { method: 'GET' });
 			const totalSize = parseInt(response.headers.get('content-length')) || this.downloadSize;
 			const endTime = performance.now();
 			const speedMbps = ((totalSize * 8) / ((endTime - startTime) / 1000)) / 1000000;
@@ -40,7 +46,7 @@ const testConnectionSpeed = {
 
 function rankCountries() {
 	const ms = performance.now();
-
+	
 	const myNameInputs = document.querySelectorAll(".myNameInputs");
 	const myScoreInputs = document.querySelectorAll(".myScoreInputs");
 	const ranking = document.getElementById("ranking");
@@ -53,17 +59,26 @@ function rankCountries() {
 			countries.push({ name, score: parseInt(score) });
 		}
 	}
+	const len = countries.length;
 	const original = [...countries];
 
 	const duplicates = findDuplicateIndexes(countries);
 
 	const rankedCountries = countries.sort((a, b) => b.score - a.score)
 		.map(({ name, score }, i) =>
-		`<span>${i + 1}${getOrdinal(i + 1)}: ${name} (${score}) -> ${i < 10 ? `${[12, 10, 8, 7, 6, 5, 4, 3, 2, 1][i]}` : 0} P.</span>`
+		`<span>${i + 1}<sup>${getOrdinal(i + 1)}</sup> : ${name} (${score}) -> ${i < 10 ? `${[12, 10, 8, 7, 6, 5, 4, 3, 2, 1][i]}` : 0} P.</span>`
+	);
+
+	const sumOfScores = rankedCountries.reduce(
+		(accumulator, currentValue) => {
+			const score = currentValue.match(/\((\d+)\)/)[1];
+			return accumulator + parseInt(score);
+		},
+		0 // initial value for accumulator
 	);
 	rankedCountries.splice(10, 0, null);
 
-	if (rankedCountries[rankedCountries.length - 2].score === 0) {
+	if (rankedCountries[len - 2].score === 0) {
 		Swal.fire({
 		title: "Please give points to all countries except yours.",
 		icon: "warning",
@@ -86,8 +101,8 @@ function rankCountries() {
 	}
 
 	const myText = rankedCountries.join("<br>");
-	ranking.innerHTML = myText;
-		
+	ranking.innerHTML = `My sum of all ${len} are: ${sumOfScores} P.<br><br>${myText}`;
+	
 	duration.innerText = `In ${(performance.now() - ms).toFixed(1)} ms`;
 	return original;
 }
@@ -196,20 +211,14 @@ function saveScores() {
 			title: "Score saved",
 			text: "Your scores have been saved to local storage.",
 			icon: "success",
-			didOpen: () => {
-				document.querySelector('.swal2-popup').style.backgroundColor = "orange";
-				document.querySelector('.swal2-title').style.color = "white";
-			}
+			didOpen: setPopupStyle("orange")
 		});
 	} catch (error) {
 		Swal.fire({
 			title: "Failed to save score",
 			text: error.message,
 			icon: "error",
-			didOpen: () => {
-				document.querySelector('.swal2-popup').style.backgroundColor = "darkred";
-				document.querySelector('.swal2-title').style.color = "white";
-			}
+			didOpen: setPopupStyle("darkred")
 		});
 	}
 }
@@ -270,11 +279,7 @@ function resetScores() {
 		title: "Scores reset successful",
 		text: "The scores have been removed from your device.",
 		icon: "info",
-		didOpen: () => {
-			document.querySelector('.swal2-popup').style.backgroundColor = "darkslategrey";
-			document.querySelector('.swal2-title').style.color = "white";
-		}
-		
+		didOpen: setPopupStyle("darkslategrey")
 	});
 }
 
@@ -353,12 +358,7 @@ function copyTextWithCustomModal(text) {
 			title: "1st Workaround -> Successful!",
 			text: "Top 10 was copied. Now you can send it to Franz ;-)",
 			confirmButtonText: "OK",
-			didOpen: () => {
-			const popupEl = document.querySelector('.swal2-popup');
-			const titleEl = document.querySelector('.swal2-title');
-			popupEl.style.backgroundColor = "green";
-			titleEl.style.color = "white";
-			}
+			didOpen: setPopupStyle("green")
 		});
 		return true;
 		} else {
@@ -370,12 +370,7 @@ function copyTextWithCustomModal(text) {
 		icon: "error",
 		title: errorMsg,
 		confirmButtonText: "OK",
-		didOpen: () => {
-			const popupEl = document.querySelector('.swal2-popup');
-			const titleEl = document.querySelector('.swal2-title');
-			popupEl.style.backgroundColor = "darkred";
-			titleEl.style.color = "white";
-		}
+		didOpen: setPopupStyle("darkred")
 		}).then(() => {
 		return false;
 		});
@@ -394,17 +389,12 @@ function copyToClipboard() {
 		title: "Ranking calculation",
 		text: `Oh, you forgot to ${isRankingEmpty ? "calculate" : "enter your country"}.`,
 		icon: "warning",
-		didOpen: () => {
-			const popupEl = document.querySelector('.swal2-popup');
-			const titleEl = document.querySelector('.swal2-title');
-			popupEl.style.backgroundColor = "darkorchid";
-			titleEl.style.color = "white";
-		}
+		didOpen: setPopupStyle("darkorchid")
 		});
 		return;
 	}
 
-	const textToCopy = `My Country: ${countryPutEl.value}\n\n${rankingText.split('11th')[0].trim()}`;
+	const textToCopy = `My Country is: ${countryPutEl.value}\n\n${rankingText.split('11th')[0].trim()}`;
 
 	if (navigator.clipboard) {
 		navigator.clipboard.writeText(textToCopy)
@@ -413,12 +403,7 @@ function copyToClipboard() {
 			title: "Success!",
 			text: "Top 10 was copied. Now you can send it to Franz ;-)",
 			icon: "success",
-			didOpen: () => {
-				const popupEl = document.querySelector('.swal2-popup');
-				const titleEl = document.querySelector('.swal2-title');
-				popupEl.style.backgroundColor = "green";
-				titleEl.style.color = "white";
-			}
+			didOpen: setPopupStyle("green")
 			});
 		})
 		.catch((err) => {
@@ -490,11 +475,10 @@ function show2ndSwalPopup() {
 			popup: 'custom-swal-popup',
 			title: 'custom-swal-title'
 		},
-		didOpen: () => {
-			document.querySelector('.custom-swal-popup').style.backgroundColor = bgColor;
-			document.querySelector('.custom-swal-title').style.color = "white";
-		},
-		timer: 4000
+		didOpen: setPopupStyle(bgColor),
+		didClose: () => {
+			testClipboard();
+		}
 	});
 }
 
@@ -507,10 +491,7 @@ if (!navigator.onLine) {
 			popup: 'custom-swal-popup',
 			title: 'custom-swal-title'
 		},
-		didOpen: () => {
-			document.querySelector('.custom-swal-popup').style.backgroundColor = "darkblue";
-			document.querySelector('.custom-swal-title').style.color = "white";
-		}
+		didOpen: setPopupStyle("darkblue")
 	});
 }
 
@@ -540,6 +521,54 @@ if (/android/i.test(os_platform)) {
 	console.log("Der Browser wird auf einem Android-Gerät ausgeführt.");
 } else if (/iPad|iPhone|iPod/.test(os_platform)) {
 	console.log("Der Browser wird auf einem iOS-Gerät ausgeführt.");
+}
+
+function testClipboard() {
+	const text = 'Lets have fun ^^';
+
+	// Create a temporary text field
+	const textField = document.createElement('textarea');
+	textField.value = text;
+	document.body.appendChild(textField);
+
+	// Select and copy the text from the text field
+	textField.select();
+	let isCopied = false;
+	try {
+		// Fails on iPhone
+		isCopied = document.execCommand('copy');
+		console.log(isCopied ? 'Text was copied to clipboard' : 'Let\'s hope that copying works.');
+	} catch (err) {
+		alert('Could not copy text', err);
+	}
+
+	// Remove the temporary text field
+	document.body.removeChild(textField);
+
+	// If the text was copied successfully, show a SweetAlert and prompt the user to paste it
+	if (isCopied) {
+		Swal.fire({
+		title: 'Please paste the following text into the input field:',
+		html: `<pre>${text}</pre><input type="text">`,
+		confirmButtonText: 'OK',
+		didOpen: setPopupStyle("darkgoldenrod"),
+		preConfirm: () => {
+			const input = Swal.getPopup().querySelector('input');
+			if (input.value !== text) {
+				Swal.showValidationMessage('Please get the admin to you immediately, that is David.');
+			}
+			return { value: input.value };
+		},
+		})
+		.then((result) => {
+			if (! result.isConfirmed) {
+				alert('Please reload the page to test Copying.');
+			}
+		})
+		.catch((err) => {
+			alert(err);
+		});
+	}
 }
 
 function remindToDrink() {
