@@ -69,16 +69,36 @@ function rankCountries() {
 		`<span>${i + 1}<sup>${getOrdinal(i + 1)}</sup> : ${name} (${score}) -> ${i < 10 ? `${[12, 10, 8, 7, 6, 5, 4, 3, 2, 1][i]}` : 0} P.</span>`
 	);
 
-	const sumOfScores = rankedCountries.reduce(
-		(accumulator, currentValue) => {
-			const score = currentValue.match(/\((\d+)\)/)[1];
-			return accumulator + parseInt(score);
-		},
-		0 // initial value for accumulator
-	);
-	rankedCountries.splice(10, 0, null);
+	let idx = 0;
+	let ctry = null;
+	let sumOfScores = 0;
 
-	if (rankedCountries[len - 2].score === 0) {
+	try {
+		sumOfScores = rankedCountries.reduce(
+			(accumulator, currentValue) => {
+				ctry = countries[idx++];
+				const score = currentValue.match(/\((-?\d+)\)/)[1];
+				return accumulator + parseInt(score);
+			},
+			0 // initial value for accumulator
+		);
+		rankedCountries.splice(10, 0, null);
+	} catch (error) {
+		Swal.fire({
+			title: "Oooh... A rare error!",
+			icon: "error",
+			text: 'It seems that one of your scores is empty. '+
+				'If you see NaN, it means: Not a Number.',
+			footer: `At ${ctry.name} -> ${ctry.score}`,
+			background: "indianred",
+			didOpen: () => {
+				document.querySelector(".swal2-title").style.color = "white";
+			},
+		});
+		idx = -1;
+	}
+
+	if (idx != -1 && rankedCountries[len - 2].score === 0) {
 		Swal.fire({
 		title: "Please give points to all countries except yours.",
 		icon: "warning",
@@ -89,14 +109,14 @@ function rankCountries() {
 		});
 	}
 
-	if (duplicates.length > 0) {
+	if (idx != -1 && duplicates.length > 0) {
 		const indexes = duplicates
 			.map((index) => index + 1).join(", ");
 		Swal.fire({
 		title: "Warning",
 		text: `Duplicate scores found for indexes: ${indexes}`,
 		icon: "warning",
-		background: "indianred",
+		background: "darkgoldenrod",
 		});
 	}
 
@@ -135,6 +155,14 @@ function hasDuplicates(array) {
 }
 
 function myCreateCountry(i) {
+	if (i === two_thirds_of_ctrys || i === (two_thirds_of_ctrys / 2 | 0)) {
+		const breakDiv = document.createElement('div');
+		breakDiv.className = 'intvActs';
+		breakDiv.textContent = "Interval Act (5 Min. Break) 🎸🍵🫖";
+		myMenu.appendChild(breakDiv);
+		myMenu.appendChild(document.createElement('hr'));
+	}
+
 	const countryDiv = document.createElement('div');
 	countryDiv.id = `countryDiv${i}`;
 	countryDiv.classList.add('ctryDivs');
@@ -443,13 +471,13 @@ if (!navigator.onLine)
 
 Swal.fire({
 	title: 'Score Default Value',
-	text: 'Whatever number you like',
+	text: 'The number you enter here will be the default value for all scores.',
 	input: 'number',
 	inputValue: 0,
 	confirmButtonText: 'Set Default',
 	background: 'cornflowerblue',
 	customClass: {
-		input: 'swal2-input-modified'
+		input: 'swal2-input-modified',
 	},
 	inputValidator: (value) => {
 		return value ? undefined : 'Please enter a valid score!';
@@ -496,6 +524,7 @@ if (!navigator.onLine) {
 }
 
 var ms = performance.now();
+const two_thirds_of_ctrys = countryCount / 3 * 2 | 0;
 
 // var ctry_obj = countries.reduce((acc,curr)=> (acc[curr]=0,acc),{});
 const ctry_names = [];
@@ -548,8 +577,9 @@ function testClipboard() {
 	// If the text was copied successfully, show a SweetAlert and prompt the user to paste it
 	if (isCopied) {
 		Swal.fire({
-		title: 'Please paste the following text into the input field:',
-		html: `<pre>${text}</pre><input type="text">`,
+		title: `${text}`,
+		html: '<input type="text"><br><br> The text has been copied. <br>'+
+			'You don\'t have to write the title text, just paste it from the clipboard. Not like last time. ;-)',
 		confirmButtonText: 'OK',
 		didOpen: setPopupStyle("darkgoldenrod"),
 		preConfirm: () => {
@@ -571,11 +601,12 @@ function testClipboard() {
 	}
 }
 
-function remindToDrink() {
+function healthyAdvice() {
+	let foods = ['🍎 Apple', '🍐 Pear', '🍊 Tangerine', '🍋 Lemon', '🍌 Banana', '🍉 Watermelon', '🍇 Grapes', '🍓 Strawberries', '💙 Blueberries', '🍈 Melon', '🍒 Cherries', '🍑 Peach', '🥭 Mango', '🍍 Pineapple', '🥥 Coconut', '🥝 Kiwi', '🍆 Aubergine', '🥑 Avocado', '🥦 Broccoli', '🥬 Leafy Vegetables', '🥒 Cucumber', '🌶 Chilli', '🥕 Carrots', '🍸 Olives', '🥚 Eggs', '🥗 Green Salad', '🍛 Curried Rice', '🌰 Chestnut', '🍵 Herbal Tea', '🍯 Honey'];
 	Swal.fire({
-		title: 'Tea time!',
-		text: 'Did you drink enough herbal tea or water?',
-		footer: `And have fun with your ${os_platform} device ;-)`,
+		title: 'Healthy Advice!',
+		text: `Have you ever tried ${foods[Math.random() * foods.length | 0]}?`,
+		footer: `A good diet, physical activity and sleep are important.<br><br> And take good care of your ${os_platform} ;-)`,
 		icon: 'info',
 		confirmButtonText: 'OK',
 		background: '#0070c0',
@@ -590,8 +621,8 @@ const INTERVAL_DURATION = 30 * 60 * 1000;
 // Erstellen einer Funktion, die das erste Interval-Set auslöst
 function setFirstInterval() {
 	setTimeout(() => {
-		remindToDrink();
-		setInterval(remindToDrink, INTERVAL_DURATION);
+		healthyAdvice();
+		setInterval(healthyAdvice, INTERVAL_DURATION);
 	}, INTERVAL_DURATION - (Date.now() % INTERVAL_DURATION));
 }
 
