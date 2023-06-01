@@ -524,7 +524,7 @@ if (!navigator.onLine) {
 }
 
 var ms = performance.now();
-const two_thirds_of_ctrys = countryCount / 3 * 2 | 0;
+const two_thirds_of_ctrys = countryCount < 15 ? countryCount : countryCount / 3 * 2 | 0;
 
 // var ctry_obj = countries.reduce((acc,curr)=> (acc[curr]=0,acc),{});
 const ctry_names = [];
