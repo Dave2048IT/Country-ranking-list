@@ -1,1 +1,1 @@
-var countries = ["Canada", "Australia", "United Kingdom", "Norway", "South Korea", "Greece", "Spain", "Congo republic-of-the", "USA", "Sweden", "Germany"];
+var countries = ["South Korea", "Australia", "United Kingdom", "Norway", "Greece", "Germany", "Canada", "Spain", "USA", "Congo republic-of-the", "Sweden"];
