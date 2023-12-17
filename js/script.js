@@ -410,9 +410,8 @@ function copyTextWithCustomModal(text) {
 function copyToClipboard() {
 	const rankingText = rankingEl.innerText.trim();
 	const isRankingEmpty = !rankingText;
-	const isCountryEmpty = !countryPutEl.value;
 
-	if (isRankingEmpty || isCountryEmpty) {
+	if (isRankingEmpty) {
 		Swal.fire({
 		title: "Ranking calculation",
 		text: `Oh, you forgot to ${isRankingEmpty ? "calculate" : "enter your country"}.`,
@@ -422,7 +421,7 @@ function copyToClipboard() {
 		return;
 	}
 
-	const textToCopy = `My Country is: ${countryPutEl.value}\n\n${rankingText.split('11th')[0].trim()}`;
+	const textToCopy = `My Country is: ${countries[selectNumber.value - 1] || "just a guest"}\n\n${rankingText.split('11th')[0].trim()}`;
 
 	if (navigator.clipboard) {
 		navigator.clipboard.writeText(textToCopy)
@@ -463,7 +462,6 @@ function copyToClipboard() {
 }
 
 const rankingEl = document.querySelector('#ranking');
-const countryPutEl = document.querySelector('#country_put');
 
 let countryCount = countries.length;
 if (!navigator.onLine)
@@ -523,33 +521,66 @@ if (!navigator.onLine) {
 	});
 }
 
-var ms = performance.now();
-const two_thirds_of_ctrys = countryCount < 15 ? countryCount : countryCount / 3 * 2 | 0;
-
 // var ctry_obj = countries.reduce((acc,curr)=> (acc[curr]=0,acc),{});
 const ctry_names = [];
 const ctry_scores = [];
+const two_thirds_of_ctrys = countryCount < 15 ? countryCount : countryCount / 3 * 2 | 0;
 
-for (let i = 0; i < countryCount; i++) {
-	const country = countries[i];
-	const name = country === 'USA' ? 'united-states-of-america' : country.toLowerCase().replace(/ /g, '-');
+var select = document.getElementById("selectNumber");
 
-	ctry_names.push(name);
-	ctry_scores.push([country, 0]);
-	const delayedCreateCountry = () => {
-		myCreateCountry(i); 
-	}
-	setTimeout(delayedCreateCountry, 0);
+countries.push("I'm just a guest. LOL");
+for(var i = 0; i < countryCount + 1; i++) {
+    var opt = countries[i];
+    var el = document.createElement("option");
+    el.textContent = `${(i + 1)}: ${opt}`;
+    el.value = i + 1;
+    select.appendChild(el);
 }
-console.log(ms = performance.now() - ms);
-duration.innerText = `In ${ms.toFixed(1)} ms`;
-delete countries;
+countries.pop();
+// delete countries;
 
-var os_platform = navigator.platform;
+var os_platform = navigator.platform || "mystery device";
 if (/android/i.test(os_platform)) {
 	console.log("Der Browser wird auf einem Android-Gerät ausgeführt.");
 } else if (/iPad|iPhone|iPod/.test(os_platform)) {
 	console.log("Der Browser wird auf einem iOS-Gerät ausgeführt.");
+}
+
+function generateCountries() {
+	if (!(selectNumber.value | 0)) {
+		alert("Please choose your Country.");
+		return;
+	}
+	var ms = performance.now();
+	selectArea.style.display = "none";
+
+	for (let i = 0; i < countryCount; i++) {
+		const country = countries[i];
+		const name = country === 'USA' ? 'united-states-of-america' : country.toLowerCase().replace(/ /g, '-');
+	
+		ctry_names.push(name);
+		ctry_scores.push([country, 0]);
+
+		if (i === selectNumber.value - 1) {
+			// Anzeigen, dass nur die anderen voten können
+			const countryDiv = document.createElement('div');
+			countryDiv.textContent = "So now you just listen, because only the others can vote. For 🎸 " + countries[i];
+			myMenu.appendChild(countryDiv);
+			myMenu.appendChild(document.createElement('hr'));
+			continue;
+		}
+		myCreateCountry(i);
+
+		// const delayedCreateCountry = () => {
+		// 	myCreateCountry(i); 
+		// }
+		// setTimeout(delayedCreateCountry, 0);
+	}
+	btnRank.style.display = "inline";
+	btnTop10.style.display = "inline";
+
+	console.log(ms = performance.now() - ms);
+	duration.innerText = `In ${ms.toFixed(1)} ms`;
 }
 
 function testClipboard() {
@@ -602,7 +633,7 @@ function testClipboard() {
 }
 
 function healthyAdvice() {
-	let foods = ['🍎 Apple', '🍐 Pear', '🍊 Tangerine', '🍋 Lemon', '🍌 Banana', '🍉 Watermelon', '🍇 Grapes', '🍓 Strawberries', '💙 Blueberries', '🍈 Melon', '🍒 Cherries', '🍑 Peach', '🥭 Mango', '🍍 Pineapple', '🥥 Coconut', '🥝 Kiwi', '🍆 Aubergine', '🥑 Avocado', '🥦 Broccoli', '🥬 Leafy Vegetables', '🥒 Cucumber', '🌶 Chilli', '🥕 Carrots', '🍸 Olives', '🥚 Eggs', '🥗 Green Salad', '🍛 Curried Rice', '🌰 Chestnut', '🍵 Herbal Tea', '🍯 Honey'];
+	let foods = ['🍎 Apple', '🍐 Pear', '🍊 Tangerine', '🍋 Lemon', '🍌 Banana', '🍉 Watermelon', '🍇 Grapes', '🍓 Strawberries', '🫐 Blueberries', '🍈 Melon', '🍒 Cherries', '🍑 Peach', '🥭 Mango', '🍍 Pineapple', '🥥 Coconut', '🥝 Kiwi', '🍆 Aubergine', '🥑 Avocado', '🥦 Broccoli', '🥬 Leafy Vegetables', '🥒 Cucumber', '🌶 Chilli', '🥕 Carrots', '🫒 Olives', '🥚 Eggs', '🥗 Green Salad', '🍛 Curried Rice', '🌰 Chestnut', '🍵 Herbal Tea', '🍯 Honey'];
 	Swal.fire({
 		title: 'Healthy Advice!',
 		text: `Have you ever tried ${foods[Math.random() * foods.length | 0]}?`,

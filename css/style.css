@@ -88,3 +88,57 @@ p.inticks {
 sup {
 	font-size: 0.7em;
 }
+#btnRank, #btnTop10 {
+	display: none;
+}
+
+.dropbtn, select {
+	background-color: darkgreen;
+	color: white;
+	padding: 16px;
+	font-size: 16px;
+	border: none;
+	cursor: pointer;
+  }
+  
+.dropbtn:hover, .dropbtn:focus {
+	background-color: #3e8e41;
+}
+  
+#myCountry, select {
+	box-sizing: border-box;
+	background-position: 14px 12px;
+	background-repeat: no-repeat;
+	font-size: 16px;
+	padding: 14px 20px 12px 45px;
+	border: none;
+	border-bottom: 1px solid #ddd;
+}
+  
+#myCountry:focus {outline: 3px solid #ddd;}
+  
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+  
+.dropdown-content, option {
+	/* display: none; */
+	position: absolute;
+	background-color: hsl(278, 100%, 20%);
+	min-width: 230px;
+	overflow: auto;
+	border: 1px solid yellow;
+	z-index: 1;
+}
+  
+.dropdown-content a, option {
+	color: #f6f6f6;
+	padding: 12px 16px;
+	text-decoration: none;
+	display: block;
+}
+
+.dropdown a:hover {background-color: darkorange;}
+  
+.show {display: block;}
