@@ -5,6 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Country Ranking List</title>
 		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="stylesheet" type="text/css" href="css/rating.css">
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.css">
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/zeroclipboard/2.3.0/ZeroClipboard.min.js"></script>
@@ -32,22 +33,48 @@
 		<hr>
 		<div id="selectArea">
 			<select id="selectNumber">
-				<option value="0">Choose a Country</option>
+				<option value="0">Choose your Country</option>
 			</select>
 			<button id="btnGen" onclick="generateCountries()">Generate Countries</button>
+			<br><br><br><br><br><br><br>
 			<hr>
 		</div>
 		<div id="myMenu"></div>
 		
 		<button id="btnRank" onclick="rankCountries()">Calculate</button>
 		<button id="btnTop10" onclick="copyToClipboard()">Copy Top 10</button>
+		
+		<label class="rating-label">
+			<h3>How much did you like</h3>
+			<strong>the show?</strong>
+			<input
+				id="ratingShow"
+				class="rating"
+				max="5"
+				oninput="this.style.setProperty('--value', this.value)"
+				step="0.5"
+				type="range"
+				value="0">
+		</label>
+		<label class="rating-label">
+			<strong>my website?</strong>
+			<input
+				id="ratingSite"
+				class="rating"
+				max="5"
+				oninput="this.style.setProperty('--value', this.value)"
+				style="--fill: #C8102E;--symbol:var(--heart);"
+				step="0.5"
+				type="range"
+				value="0">
+		</label>
+		<p></p>
 		<div id="ranking"></div>
-		<p>
-		<div id="end_text">
+		<p></p>
 		<span id="duration"></span></div>
 		<p>Provided by countryflags.com - part of ProFlags BV</p>
 		<p>Coded and designed by <br>David Schüppel @ 27.02. - 05.03.
-			<br><br>Last Update: 17.12.2023, 14:12:00
+			<br><br>Last Update: 19.12.2023, 12:53:21
 		</p>
 		<script src="js/countries.js"></script>
 		<script src="js/script.js"></script>

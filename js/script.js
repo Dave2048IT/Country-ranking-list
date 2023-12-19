@@ -47,6 +47,7 @@ const testConnectionSpeed = {
 function rankCountries() {
 	const ms = performance.now();
 	
+	document.querySelectorAll(".rating-label").forEach(a=>a.style.display = "initial");
 	const myNameInputs = document.querySelectorAll(".myNameInputs");
 	const myScoreInputs = document.querySelectorAll(".myScoreInputs");
 	const ranking = document.getElementById("ranking");
@@ -311,12 +312,12 @@ function resetScores() {
 	});
 }
 
+// Unused function
 function tableCreate() {
 	const body = document.body,
 		tbl = document.createElement('table');
 	tbl.id = "ranking_table";
 	tbl.style = "margin: auto; text-align: end;";
-	// tbl.style.width = '100px';
 	tbl.style.border = '1px solid black';
 
 	for (let i = 0; i < countryCount; i++) {
@@ -325,8 +326,6 @@ function tableCreate() {
 			const td = tr.insertCell();
 			if (j == 2)
 				td.style = "text-align: center;";
-			// td.appendChild(document.createTextNode(`Cell I${i}/J${j}`));
-			// td.style.border = '1px solid black';
 		}
 	}
 	ranking.appendChild(tbl);
@@ -421,7 +420,18 @@ function copyToClipboard() {
 		return;
 	}
 
-	const textToCopy = `My Country is: ${countries[selectNumber.value - 1] || "just a guest"}\n\n${rankingText.split('11th')[0].trim()}`;
+	if (!(ratingShow.value - 0) || !(ratingSite.value - 0)) {
+		Swal.fire({
+		title: "Oh, the rating ...",
+		text: `Please rate the show and my website. It helps me a lot :-)`,
+		icon: "warning",
+		didOpen: setPopupStyle("darkorchid")
+		});
+		return;
+	}
+
+	const textToCopy = `My Country is: ${countries[selectNumber.value - 1] || "just a guest"}\n\n${rankingText.split('11th')[0].trim()}\n\n`
+	+ `I gave the Show: ${ratingShow.value} / 5 Stars and \nDavid's Website: ${ratingSite.value} / 5 Hearts.`;
 
 	if (navigator.clipboard) {
 		navigator.clipboard.writeText(textToCopy)
@@ -521,7 +531,6 @@ if (!navigator.onLine) {
 	});
 }
 
-// var ctry_obj = countries.reduce((acc,curr)=> (acc[curr]=0,acc),{});
 const ctry_names = [];
 const ctry_scores = [];
 const two_thirds_of_ctrys = countryCount < 15 ? countryCount : countryCount / 3 * 2 | 0;
@@ -537,7 +546,6 @@ for(var i = 0; i < countryCount + 1; i++) {
     select.appendChild(el);
 }
 countries.pop();
-// delete countries;
 
 var os_platform = navigator.platform || "mystery device";
 if (/android/i.test(os_platform)) {
@@ -562,7 +570,6 @@ function generateCountries() {
 		ctry_scores.push([country, 0]);
 
 		if (i === selectNumber.value - 1) {
-			// Anzeigen, dass nur die anderen voten können
 			const countryDiv = document.createElement('div');
 			countryDiv.textContent = "So now you just listen, because only the others can vote. For 🎸 " + countries[i];
 			myMenu.appendChild(countryDiv);
@@ -570,11 +577,6 @@ function generateCountries() {
 			continue;
 		}
 		myCreateCountry(i);
-
-		// const delayedCreateCountry = () => {
-		// 	myCreateCountry(i); 
-		// }
-		// setTimeout(delayedCreateCountry, 0);
 	}
 	btnRank.style.display = "inline";
 	btnTop10.style.display = "inline";
@@ -657,4 +659,4 @@ function setFirstInterval() {
 	}, INTERVAL_DURATION - (Date.now() % INTERVAL_DURATION));
 }
 
-setFirstInterval(); // Aufruf, um den gesamten Prozess zu starten
+setFirstInterval(); // Aufruf, um den Prozess mit dem gesunden Zeug zu starten
