@@ -475,31 +475,33 @@ const rankingEl = document.querySelector('#ranking');
 
 let countryCount = countries.length;
 if (!navigator.onLine)
-	alert("Sorry, without internet you can't use the page, because I built in libraries to make the whole page more beautiful. ;-)")
+	alert("Sorry, without internet you can't use the page, because I built in libraries to make the whole page more beautiful. ;-)");
 
-Swal.fire({
-	title: 'Score Default Value',
-	text: 'The number you enter here will be the default value for all scores.',
-	input: 'number',
-	inputValue: 0,
-	confirmButtonText: 'Set Default',
-	background: 'cornflowerblue',
-	customClass: {
-		input: 'swal2-input-modified',
-	},
-	inputValidator: (value) => {
-		return value ? undefined : 'Please enter a valid score!';
-	}
-}).then((result) => {
-	if (result.isConfirmed && result.value !== "0") {
-		const defaultScore = Number.parseInt(result.value) || 0;
-		Array.from(document.getElementsByClassName('myScoreInputs')).forEach(input => {
-			input.value = defaultScore;
-		});
-		console.log(`Selected score value is ${defaultScore}`);
-	}
-	show2ndSwalPopup();
-});
+function show1stSwalPopup() {
+	Swal.fire({
+		title: 'Score Default Value',
+		text: 'The number you enter here will be the default value for all scores. If you\'re unsure, leave it at 0.',
+		input: 'number',
+		inputValue: 0,
+		confirmButtonText: 'Set Default',
+		background: 'cornflowerblue',
+		customClass: {
+			input: 'swal2-input-modified',
+		},
+		inputValidator: (value) => {
+			return value ? undefined : 'Please enter a valid score!';
+		}
+	}).then((result) => {
+		if (result.isConfirmed && result.value !== "0") {
+			const defaultScore = Number.parseInt(result.value) || 0;
+			Array.from(document.getElementsByClassName('myScoreInputs')).forEach(input => {
+				input.value = defaultScore;
+			});
+			console.log(`Selected score value is ${defaultScore}`);
+		}
+		show2ndSwalPopup();
+	});
+}
 
 function show2ndSwalPopup() {
 	const bgColor = navigator.onLine ? "#2196F3" : "darkblue";
@@ -578,6 +580,7 @@ function generateCountries() {
 		}
 		myCreateCountry(i);
 	}
+	show1stSwalPopup();
 	btnRank.style.display = "inline";
 	btnTop10.style.display = "inline";
 
