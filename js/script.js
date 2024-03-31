@@ -199,7 +199,7 @@ function myCreateCountry(i) {
 	const textArea = createTextAreaElement(`Memo ${i+1}:`);
 
 	myMenu.append(document.createElement('hr'), `Country ${i + 1}:`, nameInput,
-		countryDiv, scoreInput, ' Points', document.createElement('br'), minusBtn, textArea, plusBtn);
+		countryDiv, scoreInput, ' Points', document.createElement('br'), minusBtn, plusBtn, document.createElement('br'), textArea);
 }
 
 function createInputElement(name, id, type, value, step) {
@@ -787,7 +787,7 @@ function showFacts() {
 }
 
 var itv1 = null;
-const INTERVAL_DURATION = 10 * 60 * 1000;
+const INTERVAL_DURATION = 15 * 60 * 1000;
 
 // Erstellen einer Funktion, die das erste Interval-Set auslöst
 function setFirstInterval() {

@@ -8,7 +8,7 @@ body, input {
 }
 textarea {
 	font-family: Helvetica;
-	width: 50%;
+	width: 80%;
 	height: 64px;
 	border-radius: 10px;
     position: relative;
@@ -61,6 +61,7 @@ p.inticks {
 	margin: 0;
 }
 .minus {
+	margin-right: 10%;
 	background-color: hsla(0, 100%, 50%, 0.25);
 }
 .plus {
