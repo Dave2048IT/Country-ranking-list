@@ -50,7 +50,7 @@ const testConnectionSpeed = {
 	}
 };
 
-function rankCountries() {
+function rankCountries(op = 1) {
 	const ms = performance.now();
 	
 	document.querySelectorAll(".rating-label").forEach(a=>a.style.display = "initial");
@@ -66,6 +66,11 @@ function rankCountries() {
 			countries.push({ name, score: parseInt(score) });
 		}
 	}
+
+	// op 2 => for autosaving (faster)
+	if (op === 2)
+		return countries;
+
 	const len = countries.length;
 	const original = [...countries];
 
@@ -238,22 +243,30 @@ myMenu.addEventListener('click', function(e) {
 	} else if (e.target.matches('.plus')) {
 		window[`score${i}`].value -= -1;
 	}
+	if (autosave1)
+		saveScores(2);
 });
 
-function saveScores() {
+/**
+ * 
+ * @param {number} op 1 => normal / 2 => for autosaving (faster) 
+ */
+function saveScores(op = 1) {
 	try {
-		let countries = rankCountries();
+		let countries = rankCountries(op);
 		localStorage.setItem("ctry_scores", JSON.stringify(
 			countries.map(item => ({name: item.name, score: item.score}))
 		));
 		localStorage.setItem("ctry_timestamp", Date.now());
 		
-		Swal.fire({
-			title: "Score saved",
-			text: "Your scores have been saved to local storage.",
-			icon: "success",
-			didOpen: setPopupStyle("orange")
-		});
+		if (op === 1) {
+			Swal.fire({
+				title: "Score saved",
+				text: "Your scores have been saved to local storage.",
+				icon: "success",
+				didOpen: setPopupStyle("orange")
+			});
+		}
 	} catch (error) {
 		Swal.fire({
 			title: "Failed to save score",
@@ -593,6 +606,11 @@ function show3rdSwalPopup() {
 		didOpen: setPopupStyle("#808000"),
 	}).then(function(isConfirm) {
 		autosave1 = isConfirm.isConfirmed;
+		if (autosave1) {
+			window.addEventListener('input', function (evt) {
+				saveScores(2);
+			});			
+		}
 	})
 }
 
