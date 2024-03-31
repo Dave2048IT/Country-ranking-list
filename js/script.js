@@ -16,9 +16,15 @@ window.addEventListener('load', async () => {
 	}, 500);
 });
 
+// Bevor die Seite geschlossen wird
 window.addEventListener("beforeunload", function (event) {
 	if (!("ctry_scores" in localStorage)) {
+		// Wird anders angezeigt
 		event.returnValue = "You have unsaved changes. If you leave now, your progress will be lost. Are you sure you want to leave?";
+	}
+	if (autosave1) {
+		this.localStorage.setItem("ctry_timestamp", Date.now());
+		saveScores();
 	}
 });
 
@@ -99,7 +105,7 @@ function rankCountries() {
 		idx = -1;
 	}
 
-	if (idx != -1 && rankedCountries[len - 2].score === 0) {
+	if (idx != -1 && countries[len - 2].score === 0) {
 		Swal.fire({
 		title: "Please give points to all countries except yours.",
 		icon: "warning",
@@ -114,16 +120,23 @@ function rankCountries() {
 		const indexes = duplicates
 			.map((index) => index + 1).join(", ");
 		Swal.fire({
-		title: "Warning",
-		text: `Duplicate scores found for indexes: ${indexes}`,
-		icon: "warning",
-		background: "darkgoldenrod",
+			title: "Warning",
+			text: `Duplicate scores found for indexes: ${indexes}`,
+			icon: "warning",
+			background: "darkgoldenrod",
 		});
 	}
 
 	const myText = rankedCountries.join("<br>");
 	ranking.innerHTML = `My sum of all ${len} are: ${sumOfScores} P.<br><br>${myText}`;
 	
+	Swal.fire({
+		title: "Successfully calculated.",
+		text: "Scroll down to see more",
+		icon: "success",
+		didOpen: setPopupStyle("green")
+	});
+
 	duration.innerText = `In ${(performance.now() - ms).toFixed(1)} ms`;
 	return original;
 }
@@ -160,8 +173,8 @@ function myCreateCountry(i) {
 		const breakDiv = document.createElement('div');
 		breakDiv.className = 'intvActs';
 		breakDiv.textContent = "Interval Act (5 Min. Break) 🎸🍵🫖";
-		myMenu.appendChild(breakDiv);
 		myMenu.appendChild(document.createElement('hr'));
+		myMenu.appendChild(breakDiv);
 	}
 
 	const countryDiv = document.createElement('div');
@@ -176,13 +189,12 @@ function myCreateCountry(i) {
 
 	const plusBtn = createButtonElement('plus', i, '↑');
 	const minusBtn = createButtonElement('minus', i, '↓');
-	const inticks = createInticksElement([minusBtn, plusBtn]);
+	// const inticks = createInticksElement([minusBtn, plusBtn]);
 
 	const textArea = createTextAreaElement(`Memo ${i+1}:`);
 
-	countryDiv.append(`Country ${i + 1}:`, nameInput, scoreInput, ' Points', inticks, document.createElement('hr'));
-
-	myMenu.append(textArea, countryDiv);
+	myMenu.append(document.createElement('hr'), `Country ${i + 1}:`, nameInput,
+		countryDiv, scoreInput, ' Points', document.createElement('br'), minusBtn, textArea, plusBtn);
 }
 
 function createInputElement(name, id, type, value, step) {
@@ -220,11 +232,10 @@ function createTextAreaElement(placeholder) {
 }
 
 myMenu.addEventListener('click', function(e) {
+	const i = e.target.value;
 	if (e.target.matches('.minus')) {
-		const i = e.target.value;
 		window[`score${i}`].value -= 1;
 	} else if (e.target.matches('.plus')) {
-		const i = e.target.value;
 		window[`score${i}`].value -= -1;
 	}
 });
@@ -235,6 +246,7 @@ function saveScores() {
 		localStorage.setItem("ctry_scores", JSON.stringify(
 			countries.map(item => ({name: item.name, score: item.score}))
 		));
+		localStorage.setItem("ctry_timestamp", Date.now());
 		
 		Swal.fire({
 			title: "Score saved",
@@ -266,15 +278,27 @@ function loadScores() {
 
 			return null;
 		}
+		
+		let a, b;
+		for (a = b = 0; a < countryCount; a++) {
+			
+			// if (a + 1 == localStorage.getItem("ctry_id")) {
+			// 	b++;
+			// 	continue;
+			// }
 
-		for (let i = 0; i < countryCount; i++) {
-			const nameInput = window["name" + i];
-			const scoreInput = window["score" + i];
-			const {name: nameValue = "", score: scoreValue = 0} = storedScores[i] || {};
-			nameInput.value = nameValue;
-			scoreInput.value = scoreValue;
+			try {
+				const nameInput = window["name" + a];
+				const scoreInput = window["score" + a];
+				const {name: nameValue = "", score: scoreValue = 0} = storedScores[b] || {};
+				nameInput.value = nameValue;
+				scoreInput.value = scoreValue;
+				b++;
+			} catch (error) {
+				console.log("Error at Country Nr.", a+1, " -> ", error);
+			}
 		}
-
+		
 		Swal.fire({
 			title: "Scores loaded successfully",
 			icon: "success",
@@ -294,6 +318,25 @@ function loadScores() {
 	}
 }
 
+function randomPoints() {
+	console.log("This is just for testing!");
+
+	Swal.fire({
+		icon: "warning",
+		title: "This button will randomize the points.",
+		didOpen: setPopupStyle("darkred")
+	})
+	
+	for (let i = 0; i < countryCount; i++) {
+		try {
+			const scoreInput = window["score" + i];
+			scoreInput.value = Math.random() * 110 | 0;
+		} catch (error) {
+			console.log("Error at Country Nr.", i+1, " -> ", error);
+		}
+	}
+}
+
 function setPopupStyle(bgColor) {
 	return () => {
 		document.querySelector(".swal2-popup").style.backgroundColor = bgColor;
@@ -310,25 +353,6 @@ function resetScores() {
 		icon: "info",
 		didOpen: setPopupStyle("darkslategrey")
 	});
-}
-
-// Unused function
-function tableCreate() {
-	const body = document.body,
-		tbl = document.createElement('table');
-	tbl.id = "ranking_table";
-	tbl.style = "margin: auto; text-align: end;";
-	tbl.style.border = '1px solid black';
-
-	for (let i = 0; i < countryCount; i++) {
-		const tr = tbl.insertRow();
-		for (let j = 0; j < 4; j++) {
-			const td = tr.insertCell();
-			if (j == 2)
-				td.style = "text-align: center;";
-		}
-	}
-	ranking.appendChild(tbl);
 }
 
 function setFallbackZeroClipboard(text) {
@@ -413,25 +437,19 @@ function copyToClipboard() {
 	if (isRankingEmpty) {
 		Swal.fire({
 		title: "Ranking calculation",
-		text: `Oh, you forgot to ${isRankingEmpty ? "calculate" : "enter your country"}.`,
+		text: `Oh, you forgot to calculate.`,
 		icon: "warning",
 		didOpen: setPopupStyle("darkorchid")
 		});
 		return;
 	}
 
-	if (!(ratingShow.value - 0) || !(ratingSite.value - 0)) {
-		Swal.fire({
-		title: "Oh, the rating ...",
-		text: `Please rate the show and my website. It helps me a lot :-)`,
-		icon: "warning",
-		didOpen: setPopupStyle("darkorchid")
-		});
-		return;
-	}
-
-	const textToCopy = `My Country is: ${countries[selectNumber.value - 1] || "just a guest"}\n\n${rankingText.split('11th')[0].trim()}\n\n`
-	+ `I gave the Show: ${ratingShow.value} / 5 Stars and \nDavid's Website: ${ratingSite.value} / 5 Hearts.`;
+	let textToCopy = `My Country is: ${countries[selectNumber.value - 1] || "just a guest"}\n\n${rankingText.split('11th')[0].trim()}\n\n`
+	if (ratingShow.value - 0)
+		textToCopy += `I gave the Show: ${ratingShow.value} / 5 Stars.\n`;
+	
+	if (ratingSite.value - 0)
+		textToCopy += `I gave David's Website: ${ratingSite.value} / 5 Hearts.\n`;
 
 	if (navigator.clipboard) {
 		navigator.clipboard.writeText(textToCopy)
@@ -477,7 +495,50 @@ let countryCount = countries.length;
 if (!navigator.onLine)
 	alert("Sorry, without internet you can't use the page, because I built in libraries to make the whole page more beautiful. ;-)");
 
+function autoload() {
+	if ("ctry_scores" in localStorage) {
+		Swal.fire({
+			title: "Savedata found. Do you want to load it?",
+			text: "If you're unsure, click No.",
+			footer: `From ${new Date(localStorage.getItem("ctry_timestamp") - 0).toLocaleString()}`,
+			icon: "question",
+			showCancelButton: true,
+			confirmButtonText: "Yes",
+			cancelButtonText: "No",
+			didOpen: setPopupStyle("darkcyan"),
+		}).then(function(isConfirm) {
+			if (!isConfirm.isConfirmed) {
+				Swal.fire({
+					title: "Do you want to erase it?",
+					text: "By clicking Yes, the site will reload.",
+					icon: "question",
+					showCancelButton: true,
+					confirmButtonText: "Yes",
+					cancelButtonText: "No",
+					didOpen: setPopupStyle("darkred"),
+				}).then(function(isConfirm) {
+					if (isConfirm.isConfirmed) {
+						resetScores();
+						location.reload();
+					}
+				})
+				return false;
+			}
+			// isConfirm.isConfirmed == true
+			loadScores();
+			setTimeout(() => {
+				show3rdSwalPopup();
+			}, 2000);
+		})
+		return true;
+	}
+	return false;
+}
+
 function show1stSwalPopup() {
+	if (autoload())
+		return;
+
 	Swal.fire({
 		title: 'Score Default Value',
 		text: 'The number you enter here will be the default value for all scores. If you\'re unsure, leave it at 0.',
@@ -515,9 +576,24 @@ function show2ndSwalPopup() {
 		},
 		didOpen: setPopupStyle(bgColor),
 		didClose: () => {
-			testClipboard();
+			show3rdSwalPopup();
 		}
 	});
+}
+
+function show3rdSwalPopup() {
+	Swal.fire({
+		title: "Do you want to enable autosave?",
+		text: "If you're unsure, click Yes.",
+		footer: "It saves your points automatically when you close the page (even by accident).",
+		icon: "question",
+		showCancelButton: true,
+		confirmButtonText: "Yes",
+        cancelButtonText: "No",
+		didOpen: setPopupStyle("#808000"),
+	}).then(function(isConfirm) {
+		autosave1 = isConfirm.isConfirmed;
+	})
 }
 
 if (!navigator.onLine) {
@@ -537,8 +613,10 @@ const ctry_names = [];
 const ctry_scores = [];
 const two_thirds_of_ctrys = countryCount < 15 ? countryCount : countryCount / 3 * 2 | 0;
 
+var autosave1 = false;
 var select = document.getElementById("selectNumber");
 
+// The actual countries array can be found in the file countries.js
 countries.push("I'm just a guest. LOL");
 for(var i = 0; i < countryCount + 1; i++) {
     var opt = countries[i];
@@ -574,8 +652,8 @@ function generateCountries() {
 		if (i === selectNumber.value - 1) {
 			const countryDiv = document.createElement('div');
 			countryDiv.textContent = "So now you just listen, because only the others can vote. For 🎸 " + countries[i];
-			myMenu.appendChild(countryDiv);
 			myMenu.appendChild(document.createElement('hr'));
+			myMenu.appendChild(countryDiv);
 			continue;
 		}
 		myCreateCountry(i);
@@ -586,55 +664,6 @@ function generateCountries() {
 
 	console.log(ms = performance.now() - ms);
 	duration.innerText = `In ${ms.toFixed(1)} ms`;
-}
-
-function testClipboard() {
-	const text = 'Lets have fun ^^';
-
-	// Create a temporary text field
-	const textField = document.createElement('textarea');
-	textField.value = text;
-	document.body.appendChild(textField);
-
-	// Select and copy the text from the text field
-	textField.select();
-	let isCopied = false;
-	try {
-		// Fails on iPhone
-		isCopied = document.execCommand('copy');
-		console.log(isCopied ? 'Text was copied to clipboard' : 'Let\'s hope that copying works.');
-	} catch (err) {
-		alert('Could not copy text', err);
-	}
-
-	// Remove the temporary text field
-	document.body.removeChild(textField);
-
-	// If the text was copied successfully, show a SweetAlert and prompt the user to paste it
-	if (isCopied) {
-		Swal.fire({
-		title: `${text}`,
-		html: '<input type="text"><br><br> The text has been copied. <br>'+
-			'You don\'t have to write the title text, just paste it from the clipboard. Not like last time. ;-)',
-		confirmButtonText: 'OK',
-		didOpen: setPopupStyle("darkgoldenrod"),
-		preConfirm: () => {
-			const input = Swal.getPopup().querySelector('input');
-			if (input.value !== text) {
-				Swal.showValidationMessage('Please get the admin to you immediately, that is David.');
-			}
-			return { value: input.value };
-		},
-		})
-		.then((result) => {
-			if (! result.isConfirmed) {
-				alert('Please reload the page to test Copying.');
-			}
-		})
-		.catch((err) => {
-			alert(err);
-		});
-	}
 }
 
 function healthyAdvice() {
@@ -652,14 +681,102 @@ function healthyAdvice() {
 	})
 }
 
-const INTERVAL_DURATION = 30 * 60 * 1000;
+function showFacts() {
+	let facts = [
+		{
+			q: "How many people are living in Sweden?",
+			a: "10,551,707 (December 31, 2023)"
+		},
+		{
+			q: "Who is the current Head of state in Japan?",
+			a: "Tennō Naruhito (Emperor)"
+		},
+		{
+			q: "How big is Switzerland in km² ?",
+			a: `• Total 41,285 km² (15,940 mi²)
+			<br>(Rank 132nd)
+			<br>• Water 4.34 % -> 691.8 mi²`
+		},
+		{
+			q: "In Paris, there is only one stop sign, but there is also a Statue of Liberty and you can marry dead people and the Eiffel Tower. But by law you can't call your pig Napoleon."
+		},
+		{
+			q: "The longest word ever published in German is: Donaudampfschifffahrtselektrizitätenhauptbetriebswerkbauunterbeamtengesellschaft."
+		},
+		{
+			q: "Finland: The amount of the fine depends on the driver's income if the speed limit is exceeded by 20 km/h or more. In Finland, this can sometimes lead to five-figure fines."
+		},
+		{
+			q: "Romania: Here you will find the waterfall that is considered by many to be the most beautiful waterfall in the world: Cascada Bigar. The village of Sâpânta in the Romanian region of Maramures is also home to what is probably the world's most colorful cemetery."
+		},
+		{
+			q: "There is an almost 500-year-old statue in Switzerland that shows the fountain figure eating children: the Kindlifresserbrunnen. The figure was once used to intimidate disobedient children."
+		},
+		{
+			q: `In Hong Kong, you can study "Bra Studies" - i.e. BH sciences.`
+		},
+		{
+			q: "Spain has the oldest existing lighthouse, the Tower of Hercules."
+		},
+		{
+			q: `Australia is both a country and a continent.
+			Its unique distinction as the smallest continent and a major country offers a variety of natural wonders.`
+		},
+		{
+			q: "Japan has the highest density of vending machines."
+		},
+		{
+			q: `Italy boasts the highest number of UNESCO World Heritage Sites, a testament to its rich historical and cultural legacy.
+			These sites range from ancient Roman ruins to Renaissance art, reflecting Italy's profound impact on world history and culture.`
+		},
+		{
+			q: "How many countries are there in South America?",
+			a: `It comprises 12 countries.
+			<br>Exploring this diverse continent offers a range of experiences, from the Amazon rainforest to the Andes Mountains.`
+		},
+		{
+			q: "How many countries are there in the world?",
+			a: `Currently, there are 195 countries in the world. This includes recognized sovereign states with distinct territories, governments, and populations.`
+		}
+	];
+	let i = Math.random() * facts.length | 0;
+	Swal.fire({
+		title: facts[i].a ? "Question:" : "Did you know?",
+		text: facts[i].q,
+		// footer: facts[i].a,
+		icon: 'info',
+		confirmButtonText: 'OK',
+		background: '#0070c0',
+		didOpen: () => {
+			document.querySelector('.swal2-title').style.color = "yellow";
+		},
+		didClose: () => {
+			if (facts[i].a) {
+				Swal.fire({
+					text: 'The answer is ...',
+					title: facts[i].q,
+					footer: facts[i].a,
+					icon: 'info',
+					confirmButtonText: 'OK',
+					background: 'purple',
+					didOpen: () => {
+						document.querySelector('.swal2-title').style.color = "gold";
+					}
+				});
+			}
+		}
+	});
+}
+
+var itv1 = null;
+const INTERVAL_DURATION = 10 * 60 * 1000;
 
 // Erstellen einer Funktion, die das erste Interval-Set auslöst
 function setFirstInterval() {
 	setTimeout(() => {
-		healthyAdvice();
-		setInterval(healthyAdvice, INTERVAL_DURATION);
+		showFacts();
+		itv1 = setInterval(showFacts, INTERVAL_DURATION);
 	}, INTERVAL_DURATION - (Date.now() % INTERVAL_DURATION));
 }
 
-setFirstInterval(); // Aufruf, um den Prozess mit dem gesunden Zeug zu starten
+setFirstInterval();

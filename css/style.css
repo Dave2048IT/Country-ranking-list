@@ -11,6 +11,8 @@ textarea {
 	width: 64%;
 	height: 64px;
 	border-radius: 10px;
+    position: relative;
+	top: 16px;
 }
 input, button {
 	font-size: 1em;
@@ -26,6 +28,7 @@ input[type=number] {
 	width: 5rem;
 }
 .ctryDivs {
+	height: 4em;
 	background: no-repeat scroll center / contain;
 }
 #ranking_old {
@@ -36,7 +39,7 @@ input[type=number] {
 #myMenu {
 	float: left;
 }
-#ranking span:nth-child(3) {
+#ranking span:nth-child(3), #no1 {
 	color: hsl(45, 100%, 53%);
 }
 #ranking span:nth-child(5) {
@@ -49,8 +52,7 @@ input[type=number] {
 	color: lightcoral;
 }
 .tickBtns {
-	width: 20%;
-	margin: 0 5%;
+	border-radius: 10px;
 	font-size: 3rem;
 	touch-action: manipulation;
 }
@@ -58,11 +60,9 @@ p.inticks {
 	margin: 0;
 }
 .minus {
-	border-radius: 0 2rem;
 	background-color: hsla(0, 100%, 50%, 0.25);
 }
 .plus {
-	border-radius: 2rem 0;
 	background-color: hsla(120, 100%, 50%, 0.25)
 }
 .warnung {

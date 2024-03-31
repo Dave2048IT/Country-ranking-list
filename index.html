@@ -25,11 +25,13 @@
 			<button type="button" onclick="loadScores()">Load</button>
 			<button type="button" onclick="saveScores()">Save</button>
 			<button type="button" onclick="resetScores()">Reset</button>
+			<button type="button" onclick="randomPoints()">A secret?</button>
 		</div>
 		<br><div>All resources were fully loaded in <span id="reqMS">---</span> ms</div>
 		<br><div>Download-Speed from CDN: <span id="downMb">---</span> Mbit/s</div>
-		<br>At the end of the page, the points are sorted automatically,
-		<br>so it doesn't matter whether you give a song 12 or 999 points ;-)
+		<br>After rating all songs, the points will be ranked automatically,
+		<br>so it doesn't matter whether you give a song 12 or 300 points,
+		<br>the song with the highest points will be <span id="no1">#1</span> and so on. ;-)
 		<hr>
 		<div id="selectArea">
 			<select id="selectNumber">
@@ -40,10 +42,13 @@
 			<hr>
 		</div>
 		<div id="myMenu"></div>
+		<hr>
+		<button id="btnRank" onclick="rankCountries()">Calculate Ranking</button>
 		
-		<button id="btnRank" onclick="rankCountries()">Calculate</button>
-		<button id="btnTop10" onclick="copyToClipboard()">Copy Top 10</button>
-		
+		<div id="ranking"></div>
+		<button id="btnTop10" onclick="copyToClipboard()">Copy Top 10 Countries</button>
+
+		<p></p>
 		<label class="rating-label">
 			<h3>How much did you like</h3>
 			<strong>the show?</strong>
@@ -70,13 +75,13 @@
 			<p>Tip: Hold your finger on the bar and release at the desired point.</p>
 			<br><br>
 		</label>
-		<div id="ranking"></div>
-		<p></p>
+		<br>
 		<span id="duration"></span></div>
 		<p>Provided by countryflags.com - part of ProFlags BV</p>
-		<p>Coded and designed by <br>David Schüppel @ 27.02. - 05.03.2023
-			<br><br>Last Update: 03.03.2024, 12:22:00
-		</p>
+		Coded and designed by <br>David Schüppel @ 27.02. - 05.03.2023
+		<br><br>UI Design advised by <br>Lukas Klemm @ 29.03.2024
+		<br><br>Last Update: 31.03.2024, 15:55:00
+
 		<script src="js/countries.js"></script>
 		<script src="js/script.js"></script>
 	</body>
