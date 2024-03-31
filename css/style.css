@@ -38,6 +38,7 @@ input[type=number] {
 }
 #myMenu {
 	float: left;
+	margin-bottom: 2em;
 }
 #ranking span:nth-child(3), #no1 {
 	color: hsl(45, 100%, 53%);
