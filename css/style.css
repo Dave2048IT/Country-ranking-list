@@ -1,5 +1,11 @@
 body, input {
-	background: linear-gradient(180deg, hsl(323, 100%, 23%), hsl(204, 100%, 20%));
+	background: linear-gradient(0deg, 
+        hsl(205, 100%, 30%), 
+        hsl(120, 60%, 30%), 
+        hsl(60, 100%, 30%), 
+        hsl(30, 100%, 30%), 
+        hsl(300, 100%, 30%)
+	);
 	color: white;
 	text-shadow: 2px 2px 4px black;
 	font-size: 2em;

@@ -78,7 +78,8 @@ function rankCountries(op = 1) {
 
 	const rankedCountries = countries.sort((a, b) => b.score - a.score)
 		.map(({ name, score }, i) =>
-		`<span>${i + 1}<sup>${getOrdinal(i + 1)}</sup> : ${name} (${score}) -> ${i < 10 ? `${[12, 10, 8, 7, 6, 5, 4, 3, 2, 1][i]}` : 0} P.</span>`
+		`<span>${i + 1}<sup>${getOrdinal(i + 1)}</sup> : ${name} (${score}) -> ${i < 13 ? `${[22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 3, 2, 1][i]}` : 0} P.</span>`
+		// ${i < 10 ? `${[12, 10, 8, 7, 6, 5, 4, 3, 2, 1][i]}` : 0}
 	);
 
 	let idx = 0;
@@ -94,7 +95,7 @@ function rankCountries(op = 1) {
 			},
 			0 // initial value for accumulator
 		);
-		rankedCountries.splice(10, 0, null);
+		rankedCountries.splice(13, 0, null);
 	} catch (error) {
 		Swal.fire({
 			title: "Oooh... A rare error!",
@@ -420,7 +421,7 @@ function copyTextWithCustomModal(text) {
 		Swal.fire({
 			icon: "success",
 			title: "1st Workaround -> Successful!",
-			text: "Top 10 was copied. Now you can send it to Franz ;-)",
+			text: "Top 13 was copied. Now you can send it to Franz ;-)",
 			confirmButtonText: "OK",
 			didOpen: setPopupStyle("green")
 		});
@@ -457,7 +458,7 @@ function copyToClipboard() {
 		return;
 	}
 
-	let textToCopy = `My Country is: ${countries[selectNumber.value - 1] || "just a guest"}\n\n${rankingText.split('11th')[0].trim()}\n\n`
+	let textToCopy = `My Country is: ${countries[selectNumber.value - 1] || "just a guest"}\n\n${rankingText.split('14th')[0].trim()}\n\n`
 	if (ratingShow.value - 0)
 		textToCopy += `I gave the Show: ${ratingShow.value} / 5 Stars.\n`;
 	
@@ -469,7 +470,7 @@ function copyToClipboard() {
 		.then(() => {
 			Swal.fire({
 			title: "Success!",
-			text: "Top 10 was copied. Now you can send it to Franz ;-)",
+			text: "Top 13 was copied. Now you can send it to Franz ;-)",
 			icon: "success",
 			didOpen: setPopupStyle("green")
 			});
@@ -699,95 +700,20 @@ function healthyAdvice() {
 	})
 }
 
-function showFacts() {
-	let facts = [
-		{
-			q: "How many people are living in Sweden?",
-			a: "10,551,707 (December 31, 2023)"
-		},
-		{
-			q: "Who is the current Head of state in Japan?",
-			a: "Tennō Naruhito (Emperor)"
-		},
-		{
-			q: "How big is Switzerland in km² ?",
-			a: `• Total 41,285 km² (15,940 mi²)
-			<br>(Rank 132nd)
-			<br>• Water 4.34 % -> 691.8 mi²`
-		},
-		{
-			q: "In Paris, there is only one stop sign, but there is also a Statue of Liberty and you can marry dead people and the Eiffel Tower. But by law you can't call your pig Napoleon."
-		},
-		{
-			q: "The longest word ever published in German is: Donaudampfschifffahrtselektrizitätenhauptbetriebswerkbauunterbeamtengesellschaft."
-		},
-		{
-			q: "Finland: The amount of the fine depends on the driver's income if the speed limit is exceeded by 20 km/h or more. In Finland, this can sometimes lead to five-figure fines."
-		},
-		{
-			q: "Romania: Here you will find the waterfall that is considered by many to be the most beautiful waterfall in the world: Cascada Bigar. The village of Sâpânta in the Romanian region of Maramures is also home to what is probably the world's most colorful cemetery."
-		},
-		{
-			q: "There is an almost 500-year-old statue in Switzerland that shows the fountain figure eating children: the Kindlifresserbrunnen. The figure was once used to intimidate disobedient children."
-		},
-		{
-			q: `In Hong Kong, you can study "Bra Studies" - i.e. BH sciences.`
-		},
-		{
-			q: "Spain has the oldest existing lighthouse, the Tower of Hercules."
-		},
-		{
-			q: `Australia is both a country and a continent.
-			Its unique distinction as the smallest continent and a major country offers a variety of natural wonders.`
-		},
-		{
-			q: "Japan has the highest density of vending machines."
-		},
-		{
-			q: `Italy boasts the highest number of UNESCO World Heritage Sites, a testament to its rich historical and cultural legacy.
-			These sites range from ancient Roman ruins to Renaissance art, reflecting Italy's profound impact on world history and culture.`
-		},
-		{
-			q: "How many countries are there in South America?",
-			a: `It comprises 12 countries.
-			<br>Exploring this diverse continent offers a range of experiences, from the Amazon rainforest to the Andes Mountains.`
-		},
-		{
-			q: "How many countries are there in the world?",
-			a: `Currently, there are 195 countries in the world. This includes recognized sovereign states with distinct territories, governments, and populations.`
-		}
-	];
-	let i = Math.random() * facts.length | 0;
-	Swal.fire({
-		title: facts[i].a ? "Question:" : "Did you know?",
-		text: facts[i].q,
-		// footer: facts[i].a,
-		icon: 'info',
-		confirmButtonText: 'OK',
-		background: '#0070c0',
-		didOpen: () => {
-			document.querySelector('.swal2-title').style.color = "yellow";
-		},
-		didClose: () => {
-			if (facts[i].a) {
-				Swal.fire({
-					text: 'The answer is ...',
-					title: facts[i].q,
-					footer: facts[i].a,
-					icon: 'info',
-					confirmButtonText: 'OK',
-					background: 'purple',
-					didOpen: () => {
-						document.querySelector('.swal2-title').style.color = "gold";
-					}
-				});
-			}
-		}
+function factsToArray(facts) {
+	let output = "";
+	facts.forEach((el, idx) => {
+		if (facts[idx].startsWith("###"))
+			output += `// ${el}\n`;
+		else
+			output += `{q: "${el}"},\n`;
 	});
+	console.log(output);
+	return output;
 }
 
 var itv1 = null;
-const INTERVAL_DURATION = 15 * 60 * 1000;
+const INTERVAL_DURATION = 10 * 60 * 1000;
 
 // Erstellen einer Funktion, die das erste Interval-Set auslöst
 function setFirstInterval() {
