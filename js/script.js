@@ -78,7 +78,7 @@ function rankCountries(op = 1) {
 
 	const rankedCountries = countries.sort((a, b) => b.score - a.score)
 		.map(({ name, score }, i) =>
-		`<span>${i + 1}<sup>${getOrdinal(i + 1)}</sup> : ${name} (${score}) -> ${i < 13 ? `${[22, 20, 18, 16, 14, 12, 10, 8, 6, 4, 3, 2, 1][i]}` : 0} P.</span>`
+		`<span>${i + 1}<sup>${getOrdinal(i + 1)}</sup> : ${name} (${score}) -> ${i < 12 ? `${[20, 17, 14, 12, 10, 8, 6, 5, 4, 3, 2, 1][i]}` : 0} P.</span>`
 		// ${i < 10 ? `${[12, 10, 8, 7, 6, 5, 4, 3, 2, 1][i]}` : 0}
 	);
 
@@ -95,7 +95,7 @@ function rankCountries(op = 1) {
 			},
 			0 // initial value for accumulator
 		);
-		rankedCountries.splice(13, 0, null);
+		rankedCountries.splice(12, 0, null);
 	} catch (error) {
 		Swal.fire({
 			title: "Oooh... A rare error!",
@@ -421,7 +421,7 @@ function copyTextWithCustomModal(text) {
 		Swal.fire({
 			icon: "success",
 			title: "1st Workaround -> Successful!",
-			text: "Top 13 was copied. Now you can send it to Franz ;-)",
+			text: "Top 12 was copied. Now you can send it to Franz ;-)",
 			confirmButtonText: "OK",
 			didOpen: setPopupStyle("green")
 		});
@@ -458,7 +458,7 @@ function copyToClipboard() {
 		return;
 	}
 
-	let textToCopy = `My Country is: ${countries[selectNumber.value - 1] || "just a guest"}\n\n${rankingText.split('14th')[0].trim()}\n\n`
+	let textToCopy = `My Country is: ${countries[selectNumber.value - 1] || "just a guest"}\n\n${rankingText.split('13th')[0].trim()}\n\n`
 	if (ratingShow.value - 0)
 		textToCopy += `I gave the Show: ${ratingShow.value} / 5 Stars.\n`;
 	
@@ -470,7 +470,7 @@ function copyToClipboard() {
 		.then(() => {
 			Swal.fire({
 			title: "Success!",
-			text: "Top 13 was copied. Now you can send it to Franz ;-)",
+			text: "Top 12 was copied. Now you can send it to Franz ;-)",
 			icon: "success",
 			didOpen: setPopupStyle("green")
 			});
