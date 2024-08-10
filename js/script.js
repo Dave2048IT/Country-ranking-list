@@ -78,7 +78,7 @@ function rankCountries(op = 1) {
 
 	const rankedCountries = countries.sort((a, b) => b.score - a.score)
 		.map(({ name, score }, i) =>
-		`<span>${i + 1}<sup>${getOrdinal(i + 1)}</sup> : ${name} (${score}) -> ${i < 12 ? `${[20, 17, 14, 12, 10, 8, 6, 5, 4, 3, 2, 1][i]}` : 0} P.</span>`
+		`<span>${i + 1}<sup>${getOrdinal(i + 1)}</sup> : ${name} (${score}) -> ${i < 12 ? `${[25, 18, 15, 12, 10, 8, 6, 5, 4, 3, 2, 1][i]}` : 0} P.</span>`
 		// ${i < 10 ? `${[12, 10, 8, 7, 6, 5, 4, 3, 2, 1][i]}` : 0}
 	);
 
@@ -174,15 +174,14 @@ function hasDuplicates(array) {
 	return (new Set(array)).size !== array.length;
 }
 
-function myCreateCountry(i) {
-	if (i === two_thirds_of_ctrys || i === (two_thirds_of_ctrys / 2 | 0)) {
-		const breakDiv = document.createElement('div');
-		breakDiv.className = 'intvActs';
-		breakDiv.textContent = "Interval Act (5 Min. Break) 🎸🍵🫖";
-		myMenu.appendChild(document.createElement('hr'));
-		myMenu.appendChild(breakDiv);
-	}
+let saveTimeout;
 
+function debounceAutosave(delay) {
+    clearTimeout(saveTimeout); // Verhindert, dass ein vorheriger Timer ausgeführt wird
+    saveTimeout = setTimeout(() => saveScores(2), delay); // Setzt einen neuen Timer
+}
+
+function myCreateCountry(i) {
 	const countryDiv = document.createElement('div');
 	countryDiv.id = `countryDiv${i}`;
 	countryDiv.classList.add('ctryDivs');
@@ -190,17 +189,27 @@ function myCreateCountry(i) {
 	
 	const nameInput = createInputElement('name', i, 'text', countries[i]);
 	const scoreInput = createInputElement('score', i, 'number', 0, 10);
+	const sliderInput = createInputElement('range', i, 'range', 0);
 	nameInput.classList.add('myNameInputs');
 	scoreInput.classList.add('myScoreInputs');
+	sliderInput.classList.add('sliders');
 
-	const plusBtn = createButtonElement('plus', i, '↑');
-	const minusBtn = createButtonElement('minus', i, '↓');
-	// const inticks = createInticksElement([minusBtn, plusBtn]);
+	sliderInput.addEventListener('input', function() {
+        scoreInput.value = this.value;
+		if (autosave1)
+			debounceAutosave(2000);
+    });
 
-	const textArea = createTextAreaElement(`Memo ${i+1}:`);
+    scoreInput.addEventListener('input', function() {
+        sliderInput.value = this.value;
+		if (autosave1)
+			debounceAutosave(2000);
+    });
+	
+	const textArea = createTextAreaElement(`Memo for ${countries[i]}:`);
 
 	myMenu.append(document.createElement('hr'), `Country ${i + 1}:`, nameInput,
-		countryDiv, scoreInput, ' Points', document.createElement('br'), minusBtn, plusBtn, document.createElement('br'), textArea);
+		countryDiv, scoreInput, ' Points', document.createElement('br'), sliderInput, document.createElement('br'), textArea);
 }
 
 function createInputElement(name, id, type, value, step) {
@@ -237,22 +246,12 @@ function createTextAreaElement(placeholder) {
 	return textArea;
 }
 
-myMenu.addEventListener('click', function(e) {
-	const i = e.target.value;
-	if (e.target.matches('.minus')) {
-		window[`score${i}`].value -= 1;
-	} else if (e.target.matches('.plus')) {
-		window[`score${i}`].value -= -1;
-	}
-	if (autosave1)
-		saveScores(2);
-});
-
 /**
  * 
  * @param {number} op 1 => normal / 2 => for autosaving (faster) 
  */
 function saveScores(op = 1) {
+	console.log("Speichern ...", op);
 	try {
 		let countries = rankCountries(op);
 		localStorage.setItem("ctry_scores", JSON.stringify(
@@ -293,25 +292,32 @@ function loadScores() {
 			return null;
 		}
 		
-		let a, b;
-		for (a = b = 0; a < countryCount; a++) {
-			
-			// if (a + 1 == localStorage.getItem("ctry_id")) {
-			// 	b++;
-			// 	continue;
-			// }
-
+		for (let i = 0; i < countryCount; i++) {
 			try {
-				const nameInput = window["name" + a];
-				const scoreInput = window["score" + a];
-				const {name: nameValue = "", score: scoreValue = 0} = storedScores[b] || {};
-				nameInput.value = nameValue;
-				scoreInput.value = scoreValue;
-				b++;
-			} catch (error) {
-				console.log("Error at Country Nr.", a+1, " -> ", error);
+				// Hole die entsprechenden Eingabefelder über IDs oder andere Selektoren
+				const nameInput = document.getElementById(`name${i}`);
+				const scoreInput = document.getElementById(`score${i}`);
+				const sliderInput = document.getElementById(`range${i}`);
+				
+				// Sicherstellen, dass die Eingabefelder existieren
+				if (!nameInput || !scoreInput || !sliderInput) {
+					console.warn(`One or more elements for Country Nr. ${i + 1} are missing.`);
+					continue; // Gehe zum nächsten Land, wenn eines der Elemente fehlt
+				}
+				
+				// Werte aus storedScores extrahieren
+				const { name = "", score = 0 } = storedScores[i] || {};
+				
+				// Setze die Werte für die Eingabefelder
+				if (nameInput) nameInput.value = name;
+				if (scoreInput) scoreInput.value = score;
+				if (sliderInput) sliderInput.value = score;
+			}
+			catch (error) {
+				console.error(`Error at Country Nr. ${i + 1}:`, error);
 			}
 		}
+		
 		
 		Swal.fire({
 			title: "Scores loaded successfully",
@@ -568,8 +574,8 @@ function show1stSwalPopup() {
 		}
 	}).then((result) => {
 		if (result.isConfirmed && result.value !== "0") {
-			const defaultScore = Number.parseInt(result.value) || 0;
-			Array.from(document.getElementsByClassName('myScoreInputs')).forEach(input => {
+			const defaultScore = Number(result.value) || 0; // Umwandlung in eine Zahl
+			document.querySelectorAll('.myScoreInputs, .sliders').forEach(input => {
 				input.value = defaultScore;
 			});
 			console.log(`Selected score value is ${defaultScore}`);
@@ -607,11 +613,6 @@ function show3rdSwalPopup() {
 		didOpen: setPopupStyle("#808000"),
 	}).then(function(isConfirm) {
 		autosave1 = isConfirm.isConfirmed;
-		if (autosave1) {
-			window.addEventListener('input', function (evt) {
-				saveScores(2);
-			});			
-		}
 	})
 }
 
@@ -668,13 +669,22 @@ function generateCountries() {
 		ctry_names.push(name);
 		ctry_scores.push([country, 0]);
 
+		if (i === two_thirds_of_ctrys || i === (two_thirds_of_ctrys / 2 | 0)) {
+			const breakDiv = document.createElement('div');
+			breakDiv.className = 'intvActs';
+			breakDiv.textContent = "Interval Act (5 Min. Break) 🎸🍵🫖";
+			myMenu.appendChild(document.createElement('hr'));
+			myMenu.appendChild(breakDiv);
+		}
+
 		if (i === selectNumber.value - 1) {
 			const countryDiv = document.createElement('div');
-			countryDiv.textContent = "So now you just listen, because only the others can vote. For 🎸 " + countries[i];
+			countryDiv.textContent = "Now you just listen. For 🎸 " + countries[i];
 			myMenu.appendChild(document.createElement('hr'));
 			myMenu.appendChild(countryDiv);
 			continue;
 		}
+
 		myCreateCountry(i);
 	}
 	show1stSwalPopup();

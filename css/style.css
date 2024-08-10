@@ -1,11 +1,12 @@
 body, input {
-	background: linear-gradient(0deg, 
+	/* background: linear-gradient(0deg, 
         hsl(205, 100%, 30%), 
         hsl(120, 60%, 30%), 
         hsl(60, 100%, 30%), 
         hsl(30, 100%, 30%), 
         hsl(300, 100%, 30%)
-	);
+	); */
+	background-color: #542;
 	color: white;
 	text-shadow: 2px 2px 4px black;
 	font-size: 2em;
@@ -151,3 +152,43 @@ sup {
 .dropdown a:hover {background-color: darkorange;}
   
 .show {display: block;}
+
+
+/* Basis-Stil für den Slider */
+input.sliders {
+    -webkit-appearance: none; /* Entfernt den Standard-Stil für Webkit-Browser */
+    width: 90%; /* Setzt die Breite des Sliders auf 90% des Containers */
+    height: 8px; /* Höhe des Track-Bereichs */
+    background: linear-gradient(to right, red, yellow, green, turquoise); /* Farbverlauf von Rot nach Grün */
+    border-radius: 5px; /* Abgerundete Ecken für den Track */
+	margin-top: 32px;
+}
+
+input.sliders::-webkit-slider-thumb {
+    width: 48px; /* Breite des Thumbs */
+    height: 48px; /* Höhe des Thumbs */
+    background: url('https://pluspng.com/img-png/png-eighth-note-isolated-eight-note-png-512.png') no-repeat center center;
+    background-size: contain; /* Skaliert das Bild, um den Thumb auszufüllen */
+    border: none; /* Entfernt den Standard-Rand */
+    border-radius: 50%; /* Macht den Thumb rund */
+    cursor: pointer;
+    -webkit-appearance: none; /* Entfernt die Standard-Stile für Webkit-Browser */
+	filter: brightness(0) invert(1); /* Macht das Bild weiß */
+	position: relative;
+	top: -3px;
+}
+
+
+/* Media Query für mobile Geräte */
+@media (max-width: 768px) {
+    input.sliders {
+        height: 12px; /* Erhöht die Höhe des Tracks für bessere Benutzerfreundlichkeit auf Touchscreens */
+    }
+
+    input.sliders::-webkit-slider-thumb,
+    input.sliders::-moz-range-thumb,
+    input.sliders::-ms-thumb {
+        width: 30px; /* Erhöht die Größe des Knopfes für einfaches Tippen */
+        height: 30px; /* Erhöht die Größe des Knopfes für einfaches Tippen */
+    }
+}
