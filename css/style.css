@@ -1,16 +1,9 @@
 body, input {
-	/* background: linear-gradient(0deg, 
-        hsl(205, 100%, 30%), 
-        hsl(120, 60%, 30%), 
-        hsl(60, 100%, 30%), 
-        hsl(30, 100%, 30%), 
-        hsl(300, 100%, 30%)
-	); */
-	background-color: #542;
+	background-color: #1d1d1d;
 	color: white;
 	text-shadow: 2px 2px 4px black;
 	font-size: 2em;
-	font-family: Helvetica;
+	font-family: 'Roboto', Arial, sans-serif;
 	text-align: center;
 }
 textarea {
@@ -21,12 +14,14 @@ textarea {
     position: relative;
 	top: 16px;
 }
-input, button {
+input, button, select {
 	font-size: 1em;
 	margin: 5px 0;
+	max-height: 2em;
+	border-radius: 8px;
 }
 input {
-	width: 11rem;
+	width: 14rem;
 	background: hsla(0, 0%, 0%, 0.5);
 	border: 1px solid aqua;
 	border-radius: 20px;
@@ -35,8 +30,12 @@ input[type=number] {
 	width: 5rem;
 }
 .ctryDivs {
-	height: 4em;
-	background: no-repeat scroll center / contain;
+	width: 6em;
+    height: 4em;
+	margin: 10px auto;
+    border: 1px solid white;
+    border-radius: 20%;
+    background: no-repeat scroll center / contain;
 }
 #ranking_old {
 	text-align: right;
@@ -47,33 +46,27 @@ input[type=number] {
 	float: left;
 	margin-bottom: 2em;
 }
-#ranking span:nth-child(3), #no1 {
+#ranking span:nth-child(1), #no1 {
 	color: hsl(45, 100%, 53%);
 }
-#ranking span:nth-child(5) {
+#ranking span:nth-child(3) {
 	color: hsl(0, 0%, 83%);
 }
-#ranking span:nth-child(7) {
+#ranking span:nth-child(5) {
 	color: hsl(27, 60%, 50%);
 }
 #ranking span:nth-child(even) {
 	color: lightcoral;
+}
+#ranking {
+	font-size: 0.8em;
+	margin: 1em 0;
 }
 .tickBtns {
 	border-radius: 10px;
 	font-size: 3rem;
 	touch-action: manipulation;
 	width: min-content;
-}
-p.inticks {
-	margin: 0;
-}
-.minus {
-	margin-right: 10%;
-	background-color: hsla(0, 100%, 50%, 0.25);
-}
-.plus {
-	background-color: hsla(120, 100%, 50%, 0.25)
 }
 .warnung {
 	position: fixed;
@@ -109,13 +102,11 @@ sup {
 	font-size: 16px;
 	border: none;
 	cursor: pointer;
-  }
-  
+}
 .dropbtn:hover, .dropbtn:focus {
 	background-color: #3e8e41;
 }
-  
-#myCountry, select {
+select {
 	box-sizing: border-box;
 	background-position: 14px 12px;
 	background-repeat: no-repeat;
@@ -124,14 +115,11 @@ sup {
 	border: none;
 	border-bottom: 1px solid #ddd;
 }
-  
-#myCountry:focus {outline: 3px solid #ddd;}
-  
+
 .dropdown {
 	position: relative;
 	display: inline-block;
 }
-  
 .dropdown-content, option {
 	/* display: none; */
 	position: absolute;
@@ -141,13 +129,14 @@ sup {
 	border: 1px solid yellow;
 	z-index: 1;
 }
-  
 .dropdown-content a, option {
 	color: #f6f6f6;
 	padding: 12px 16px;
 	text-decoration: none;
 	display: block;
 }
+
+select:focus {outline: 3px solid #ddd;}
 
 .dropdown a:hover {background-color: darkorange;}
   
@@ -157,27 +146,24 @@ sup {
 /* Basis-Stil für den Slider */
 input.sliders {
     -webkit-appearance: none; /* Entfernt den Standard-Stil für Webkit-Browser */
+	appearance: none; /* Entfernt das Standard-Styling auf anderen Browsern */
     width: 90%; /* Setzt die Breite des Sliders auf 90% des Containers */
     height: 8px; /* Höhe des Track-Bereichs */
     background: linear-gradient(to right, red, yellow, green, turquoise); /* Farbverlauf von Rot nach Grün */
     border-radius: 5px; /* Abgerundete Ecken für den Track */
-	margin-top: 32px;
 }
 
 input.sliders::-webkit-slider-thumb {
-    width: 48px; /* Breite des Thumbs */
-    height: 48px; /* Höhe des Thumbs */
-    background: url('https://pluspng.com/img-png/png-eighth-note-isolated-eight-note-png-512.png') no-repeat center center;
-    background-size: contain; /* Skaliert das Bild, um den Thumb auszufüllen */
-    border: none; /* Entfernt den Standard-Rand */
-    border-radius: 50%; /* Macht den Thumb rund */
-    cursor: pointer;
-    -webkit-appearance: none; /* Entfernt die Standard-Stile für Webkit-Browser */
-	filter: brightness(0) invert(1); /* Macht das Bild weiß */
-	position: relative;
-	top: -3px;
+    -webkit-appearance: none; /* Entfernt das Standard-Styling auf WebKit-Browsern */
+	appearance: none; /* Entfernt das Standard-Styling auf anderen Browsern */
+	width: 20px; /* Breite des Knopfes */
+	height: 20px; /* Höhe des Knopfes */
+	background: #ffffff; /* Farbe des Knopfes */
+	border: 1px solid black;
+	border-radius: 50%; /* Runde Form für den Knopf */
+	cursor: pointer; /* Zeigt den Mauszeiger als Hand an */
+	box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.5); /* Leichter Schatteneffekt */
 }
-
 
 /* Media Query für mobile Geräte */
 @media (max-width: 768px) {
@@ -191,4 +177,59 @@ input.sliders::-webkit-slider-thumb {
         width: 30px; /* Erhöht die Größe des Knopfes für einfaches Tippen */
         height: 30px; /* Erhöht die Größe des Knopfes für einfaches Tippen */
     }
+}
+
+#flagSelection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Abstand zwischen den Flaggen */
+}
+.flag {
+    cursor: pointer;
+    padding: 10px;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    text-align: center;
+    flex: 1 1 calc(25% - 20px); /* 3-4 Flaggen pro Zeile, je nach Breite */
+    box-sizing: border-box; /* Damit Padding und Border in der Breite enthalten sind */
+}
+.flag img {
+	width: 2em; /* Breite der Flaggenbilder */
+    height: auto; /* Höhe automatisch, um das Seitenverhältnis zu wahren */
+}
+.flag span {
+    display: block;
+    margin-top: 5px;
+	font-size: small;
+}
+.flag:hover {
+    border-color: darkgoldenrod; /* Hervorhebung beim Hover */
+}
+
+.button-container {
+	display: flex; /* Moderne Flexbox-Syntax */
+	justify-content: flex-start; /* Platzierung der Elemente am Anfang des Containers */
+	align-items: center; /* Zentrieren der Elemente vertikal innerhalb des Containers */
+	margin-top: 10px; /* Abstand oben */
+}
+.info-button {
+	position: relative;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 16px;
+	color: #0070c0;
+	margin-bottom: 2em;
+}
+.info-icon {
+	display: inline-block;
+	width: 3em;
+	height: 3em;
+	text-align: center;
+	line-height: 3em;
+	border-radius: 50%;
+	background: #0070c0;
+	color: white;
+	font-weight: bold;
+	font-size: 1em;
 }

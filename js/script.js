@@ -1,21 +1,3 @@
-window.addEventListener('load', async () => {
-	const startLoadTime = performance.now();
-	const reqMS = document.getElementById('reqMS');
-
-	// Test the connection speed after a delay of 500 milliseconds
-	setTimeout(async () => {
-		const pageLoadTimeMS = performance.now() - startLoadTime;
-		reqMS.textContent = Math.floor(pageLoadTimeMS);
-
-		try {
-		const speed = await testConnectionSpeed.test();
-		console.log(speed);
-		} catch (error) {
-		console.error(error);
-		}
-	}, 500);
-});
-
 // Bevor die Seite geschlossen wird
 window.addEventListener("beforeunload", function (event) {
 	if (!("ctry_scores" in localStorage)) {
@@ -27,28 +9,6 @@ window.addEventListener("beforeunload", function (event) {
 		saveScores();
 	}
 });
-
-const testConnectionSpeed = {
-	sourceAddr: "https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js",
-	downloadSize: 18501,
-
-	// Function to test connection speed
-	test: async function() {
-		try {
-			const startTime = performance.now();
-			const response = await fetch(this.sourceAddr, { method: 'GET' });
-			const totalSize = parseInt(response.headers.get('content-length')) || this.downloadSize;
-			const endTime = performance.now();
-			const speedMbps = ((totalSize * 8) / ((endTime - startTime) / 1000)) / 1000000;
-			// Set the download speed in the span element on the page
-			document.getElementById("downMb").textContent = speedMbps.toFixed(2);
-			
-			return speedMbps;
-		} catch (error) {
-			alert(error);
-		}
-	}
-};
 
 function rankCountries(op = 1) {
 	const ms = performance.now();
@@ -74,11 +34,11 @@ function rankCountries(op = 1) {
 	const len = countries.length;
 	const original = [...countries];
 
-	const duplicates = findDuplicateIndexes(countries);
-
-	const rankedCountries = countries.sort((a, b) => b.score - a.score)
+	const rankedCountries = countries
+		.sort((a, b) => b.score - a.score)
+		.slice(0, 12)
 		.map(({ name, score }, i) =>
-		`<span>${i + 1}<sup>${getOrdinal(i + 1)}</sup> : ${name} (${score}) -> ${i < 12 ? `${[25, 18, 15, 12, 10, 8, 6, 5, 4, 3, 2, 1][i]}` : 0} P.</span>`
+		`<span>${i + 1}<sup>${getOrdinal(i + 1)}</sup> : ${name} → ${i < 7 ? [12, 8, 6, 4, 3, 2, 1][i] : 0} P.</span>`
 		// ${i < 10 ? `${[12, 10, 8, 7, 6, 5, 4, 3, 2, 1][i]}` : 0}
 	);
 
@@ -122,44 +82,53 @@ function rankCountries(op = 1) {
 		});
 	}
 
-	if (idx != -1 && duplicates.length > 0) {
-		const indexes = duplicates
-			.map((index) => index + 1).join(", ");
+	const duplicatesText = findDuplicateIndexes(original);
+
+	if (duplicatesText) {
 		Swal.fire({
 			title: "Warning",
-			text: `Duplicate scores found for indexes: ${indexes}`,
+			html: `Duplicate scores found for countries:<br>${duplicatesText}`,
 			icon: "warning",
 			background: "darkgoldenrod",
+		});
+	} else {
+		Swal.fire({
+			title: "Successfully calculated.",
+			text: "Scroll down to see more",
+			icon: "success",
+			didOpen: setPopupStyle("green")
 		});
 	}
 
 	const myText = rankedCountries.join("<br>");
-	ranking.innerHTML = `My sum of all ${len} are: ${sumOfScores} P.<br><br>${myText}`;
-	
-	Swal.fire({
-		title: "Successfully calculated.",
-		text: "Scroll down to see more",
-		icon: "success",
-		didOpen: setPopupStyle("green")
-	});
-
-	duration.innerText = `In ${(performance.now() - ms).toFixed(1)} ms`;
+	ranking.innerHTML = `${myText}`;
+	console.log("Sum of all countries:", sumOfScores);
+	console.log(`Ranked in ${(performance.now() - ms).toFixed(1)} ms`);
 	return original;
 }
 
 function findDuplicateIndexes(arr) {
-	const duplicates = [];
+	const scoreMap = new Map();  // Map zum Speichern der Indizes für jeden Score
+	let result = '';  // Variable für die formatierten Ergebnisse
 	
-	for (let i = 0; i < arr.length; i++) {
-		for (let j = i + 1; j < arr.length; j++) {
-			if (arr[i].score === arr[j].score) { // prüfen, ob Elemente gleich sind
-				duplicates.push(i);
-				duplicates.push(j);
-			}
-		}
-	}
-	// entfernen Sie Duplikate aus dem Ergebnisarray und sortieren Sie es aufsteigend
-	return [...new Set(duplicates)].sort((a, b) => a - b);
+	// Durchlaufe das Array und speichere die Indizes der Scores
+	arr.forEach((item, index) => {
+	  const score = item.score;
+	  if (!scoreMap.has(score)) {
+		scoreMap.set(score, [index + 1]);  // Initialisiere ein Array mit dem ersten Index
+	  } else {
+		scoreMap.get(score).push(index + 1);  // Füge zusätzliche Indizes hinzu
+	  }
+	});
+  
+	// Durchlaufe die Map und baue das Ergebnisstring nur für Duplikate
+	scoreMap.forEach((indices, score) => {
+	  if (indices.length > 1) {
+		result += `Score: ${score} → No: ${indices.join(", No: ")}<br>`;
+	  }
+	});
+  
+	return result;
 }
 
 function getOrdinal(n) {
@@ -182,11 +151,14 @@ function debounceAutosave(delay) {
 }
 
 function myCreateCountry(i) {
-	const countryDiv = document.createElement('div');
-	countryDiv.id = `countryDiv${i}`;
-	countryDiv.classList.add('ctryDivs');
-	countryDiv.style.backgroundImage = `url(https://cdn.countryflags.com/thumbs/${ctry_names[i]}/flag-3d-250.png)`;
+	const flagDiv = document.createElement('div');
+	flagDiv.id = `flagDiv${i}`;
+	flagDiv.classList.add('ctryDivs');
+	flagDiv.style.backgroundImage = `url(https://cdn.countryflags.com/thumbs/${ctry_names[i]}/flag-400.png)`;
 	
+	// const nameText = document.createElement('span');
+    // nameText.innerText = countries[i]; // Setze den Namen des Landes als Text
+
 	const nameInput = createInputElement('name', i, 'text', countries[i]);
 	const scoreInput = createInputElement('score', i, 'number', 0, 10);
 	const sliderInput = createInputElement('range', i, 'range', 0);
@@ -194,22 +166,52 @@ function myCreateCountry(i) {
 	scoreInput.classList.add('myScoreInputs');
 	sliderInput.classList.add('sliders');
 
-	sliderInput.addEventListener('input', function() {
-        scoreInput.value = this.value;
-		if (autosave1)
+	const syncInputs = (event) => {
+		if (event.target === sliderInput) {
+			scoreInput.value = sliderInput.value;
+		} else {
+			sliderInput.value = scoreInput.value;
+		}
+		if (autosave1) {
 			debounceAutosave(2000);
-    });
+		}
+	};
 
-    scoreInput.addEventListener('input', function() {
-        sliderInput.value = this.value;
-		if (autosave1)
-			debounceAutosave(2000);
-    });
+	sliderInput.addEventListener('input', syncInputs);
+	scoreInput.addEventListener('input', syncInputs);
+
+	// Erstellen der Info-Knöpfe
+	const createInfoButton = (country, fact) => {
+		const button = document.createElement('button');
+		button.innerHTML = '<i class="info-icon">i</i>';
+		button.classList.add('info-button');
+		button.addEventListener('click', () => showFact(country, fact));
+
+		return button;
+	};
+
+	const infoButton1 = createInfoButton(countries[i], 0);
+	const infoButton2 = createInfoButton(countries[i], 1);
+
+	const countryDiv = document.createElement('div');
+	const info_div = document.createElement('div');
+	const hr = document.createElement('hr');
+	const br1 = document.createElement('br');
 	
+	const label = document.createTextNode(`Country ${i + 1}: `);
 	const textArea = createTextAreaElement(`Memo for ${countries[i]}:`);
 
-	myMenu.append(document.createElement('hr'), `Country ${i + 1}:`, nameInput,
-		countryDiv, scoreInput, ' Points', document.createElement('br'), sliderInput, document.createElement('br'), textArea);
+	// Erstellen eines Containers für die Knöpfe
+	const buttonContainer = document.createElement('div');
+	buttonContainer.classList.add('button-container');
+	info_div.append(infoButton1, br1, infoButton2);
+	buttonContainer.append(flagDiv, info_div);
+
+	const fragment = document.createDocumentFragment();
+	fragment.append(hr, label, nameInput, buttonContainer, scoreInput, ' Points', sliderInput, textArea);
+
+	countryDiv.appendChild(fragment);
+	myMenu.appendChild(countryDiv);
 }
 
 function createInputElement(name, id, type, value, step) {
@@ -292,6 +294,8 @@ function loadScores() {
 			return null;
 		}
 		
+		let scoreIndex = 0;
+
 		for (let i = 0; i < countryCount; i++) {
 			try {
 				// Hole die entsprechenden Eingabefelder über IDs oder andere Selektoren
@@ -304,14 +308,21 @@ function loadScores() {
 					console.warn(`One or more elements for Country Nr. ${i + 1} are missing.`);
 					continue; // Gehe zum nächsten Land, wenn eines der Elemente fehlt
 				}
+
+				if (scoreIndex >= storedScores.length) {
+					console.warn(`No more scores available in storedScores.`);
+					break; // Breche die Schleife ab, wenn keine weiteren Scores mehr verfügbar sind
+				}		
 				
 				// Werte aus storedScores extrahieren
-				const { name = "", score = 0 } = storedScores[i] || {};
+				const { name = "", score = 0 } = storedScores[scoreIndex] || {};
 				
 				// Setze die Werte für die Eingabefelder
-				if (nameInput) nameInput.value = name;
-				if (scoreInput) scoreInput.value = score;
-				if (sliderInput) sliderInput.value = score;
+				nameInput.value = name;
+				scoreInput.value = score;
+				sliderInput.value = score;
+				
+				scoreIndex++;
 			}
 			catch (error) {
 				console.error(`Error at Country Nr. ${i + 1}:`, error);
@@ -375,42 +386,6 @@ function resetScores() {
 	});
 }
 
-function setFallbackZeroClipboard(text) {
-	if (ZeroClipboard.isFlashUnusable()) {
-		Swal.fire({
-			icon: 'error',
-			title: 'Please try again',
-			text: 'Flash is not installed or disabled in your browser...',
-			footer: 'But anyway. If in doubt, hold and drag the text and select Copy.',
-		});
-	}
-
-	const onCopy = function(e) {
-		e.clipboardData.setData("text/plain", text);
-		Swal.fire({
-			icon: 'success',
-			title: 'Text copied to clipboard!',
-			text: 'Finally, now you can send it to Franz ;-)',
-		});
-	};
-
-	const onError = function(e) {
-		console.error(`Failed to load ZeroClipboard: ${e.name}`);
-		Swal.fire({
-			icon: 'error',
-			title: 'Error copying text',
-			text: `Sorry, there was an error copying the text to clipboard because: ${e.name}`,
-			footer: 'Please hold and drag the text.',
-		});
-	};
-
-	const clip = new ZeroClipboard(document.getElementById("btnTop10"));
-	clip.on(`ready`, function(e) {
-		clip.on(`copy`, onCopy);
-		clip.on(`error`, onError);
-	});
-}
-
 function copyTextWithCustomModal(text) {
 	const textField = document.createElement('textarea');
 	textField.textContent = text;
@@ -427,7 +402,7 @@ function copyTextWithCustomModal(text) {
 		Swal.fire({
 			icon: "success",
 			title: "1st Workaround -> Successful!",
-			text: "Top 12 was copied. Now you can send it to Franz ;-)",
+			text: `Top ${topCountries} was copied. Now you can send it to Franz ;-)`,
 			confirmButtonText: "OK",
 			didOpen: setPopupStyle("green")
 		});
@@ -464,7 +439,7 @@ function copyToClipboard() {
 		return;
 	}
 
-	let textToCopy = `My Country is: ${countries[selectNumber.value - 1] || "just a guest"}\n\n${rankingText.split('13th')[0].trim()}\n\n`
+	let textToCopy = `My Country is: ${selected_ctry}\n\n${rankingText.split('13th')[0].trim()}\n\n`
 	if (ratingShow.value - 0)
 		textToCopy += `I gave the Show: ${ratingShow.value} / 5 Stars.\n`;
 	
@@ -476,7 +451,7 @@ function copyToClipboard() {
 		.then(() => {
 			Swal.fire({
 			title: "Success!",
-			text: "Top 12 was copied. Now you can send it to Franz ;-)",
+			text: `Top ${topCountries} was copied. Now you can send it to Franz ;-)`,
 			icon: "success",
 			didOpen: setPopupStyle("green")
 			});
@@ -490,8 +465,7 @@ function copyToClipboard() {
 			background: "coral"
 			}).then(() => {
 			if (!copyTextWithCustomModal(textToCopy)) {
-				console.info("Hmmm. Another fallback please ...");
-				setFallbackZeroClipboard(textToCopy);
+				console.info("Hmmm, copying not possible ...");
 			}
 			});
 		});
@@ -502,8 +476,7 @@ function copyToClipboard() {
 		icon: "error"
 		}).then(() => {
 		if (!copyTextWithCustomModal(textToCopy)) {
-			console.info("Ouch. Another fallback please ...");
-			setFallbackZeroClipboard(textToCopy);
+			console.info("Ouch. Copying not possible ...");
 		}
 		});
 	}
@@ -512,11 +485,14 @@ function copyToClipboard() {
 const rankingEl = document.querySelector('#ranking');
 
 let countryCount = countries.length;
+let topCountries = Math.min(countryCount - 1, 12);
+
 if (!navigator.onLine)
 	alert("Sorry, without internet you can't use the page, because I built in libraries to make the whole page more beautiful. ;-)");
 
 function autoload() {
-	if ("ctry_scores" in localStorage) {
+	// Wenn mehr als 1 Tag vergangen ist, dann nicht laden.
+	if ("ctry_scores" in localStorage && Date.now() - localStorage.getItem("ctry_timestamp") < 86400000) {
 		Swal.fire({
 			title: "Savedata found. Do you want to load it?",
 			text: "If you're unsure, click No.",
@@ -556,9 +532,6 @@ function autoload() {
 }
 
 function show1stSwalPopup() {
-	if (autoload())
-		return;
-
 	Swal.fire({
 		title: 'Score Default Value',
 		text: 'The number you enter here will be the default value for all scores. If you\'re unsure, leave it at 0.',
@@ -585,6 +558,9 @@ function show1stSwalPopup() {
 }
 
 function show2ndSwalPopup() {
+	if (autoload())
+		return;
+
 	const bgColor = navigator.onLine ? "#2196F3" : "darkblue";
 	Swal.fire({
 		title: `There are ${countryCount} countries participating today. Who will win this time?`,
@@ -629,23 +605,13 @@ if (!navigator.onLine) {
 	});
 }
 
+let selected_ctry;
 const ctry_names = [];
 const ctry_scores = [];
 const two_thirds_of_ctrys = countryCount < 15 ? countryCount : countryCount / 3 * 2 | 0;
 
 var autosave1 = false;
-var select = document.getElementById("selectNumber");
-
-// The actual countries array can be found in the file countries.js
-countries.push("I'm just a guest. LOL");
-for(var i = 0; i < countryCount + 1; i++) {
-    var opt = countries[i];
-    var el = document.createElement("option");
-    el.textContent = `${(i + 1)}: ${opt}`;
-    el.value = i + 1;
-    select.appendChild(el);
-}
-countries.pop();
+generateFlags();
 
 var os_platform = navigator.platform || "mystery device";
 if (/android/i.test(os_platform)) {
@@ -654,13 +620,78 @@ if (/android/i.test(os_platform)) {
 	console.log("Der Browser wird auf einem iOS-Gerät ausgeführt.");
 }
 
-function generateCountries() {
-	if (!(selectNumber.value | 0)) {
+function confirmSelection(countryIndex, countryName) {
+    Swal.fire({
+        title: `Do you want to choose ${countryName}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, choose!',
+        cancelButtonText: 'No, cancel',
+        background: 'darkgoldenrod',
+		didOpen: () => {
+			document.querySelector(".swal2-title").style.color = "white";
+		}
+    }).then((result) => {
+        if (result.isConfirmed) {
+			selected_ctry = countryName;
+            console.log(`Selected country: ${countryName} (Index: ${countryIndex})`);
+			generateCountries(countryIndex);
+        }
+    });
+}
+
+function generateFlags() {
+	var flagSelection = document.getElementById("flagSelection");
+
+	// Die Länder-Array-Liste wird hier angenommen
+	countries.push("I'm just a guest");
+
+	// for (var i = 0; i < countryCount + 1; i++) {
+	countries.forEach((countryName, i) => {
+		let ctry = countryName === 'USA' ? 'united-states-of-america' : countryName.toLowerCase().replace(/ /g, '-');
+
+		// Erstelle das Flaggen-Container-Element
+		var flagDiv = document.createElement("div");
+		flagDiv.className = "flag";
+		flagDiv.dataset.countryIndex = i + 1; // Speichert den Index im Data-Attribut
+
+		if (countryName === "I'm just a guest") {
+			// Nur Text für den letzten Eintrag
+			flagDiv.classList.add('guest'); // Optional: für spezielles Styling
+			flagDiv.innerHTML = `<span>${i + 1}: ${countryName}</span>`;
+		} else {
+			// Füge das Bild der Flagge hinzu
+			var flagImg = document.createElement("img");
+			flagImg.src = `https://cdn.countryflags.com/thumbs/${ctry}/flag-400.png`; // Verwende den formatierten Namen für die Bild-URL
+			flagDiv.appendChild(flagImg);
+	
+			// Setze den Text mit Landname und Rang
+			var flagText = document.createElement("span");
+			flagText.innerHTML = `${i + 1}: ${countryName}`;
+			flagDiv.appendChild(flagText);
+		}	
+
+		// Füge ein Klick-Event hinzu, das die Auswahl bestätigt
+		flagDiv.onclick = function() {
+			confirmSelection(this.dataset.countryIndex, countryName);
+		};
+
+		// Füge das Flaggen-Div in den Flaggen-Container ein
+		flagSelection.appendChild(flagDiv);
+	});
+
+	countries.pop();
+}
+
+function generateCountries(countryIndex) {
+	if (countryIndex === 0) {
 		alert("Please choose your Country.");
 		return;
 	}
 	var ms = performance.now();
 	selectArea.style.display = "none";
+	if (topCountries < 12)
+		btnTop10.innerText = `Copy Top ${topCountries} Countries`;
 
 	for (let i = 0; i < countryCount; i++) {
 		const country = countries[i];
@@ -677,22 +708,21 @@ function generateCountries() {
 			myMenu.appendChild(breakDiv);
 		}
 
-		if (i === selectNumber.value - 1) {
-			const countryDiv = document.createElement('div');
-			countryDiv.textContent = "Now you just listen. For 🎸 " + countries[i];
+		if (i === countryIndex - 1) {
+			const flagDiv = document.createElement('div');
+			flagDiv.textContent = "Now you just listen. For 🎸 " + countries[i];
 			myMenu.appendChild(document.createElement('hr'));
-			myMenu.appendChild(countryDiv);
+			myMenu.appendChild(flagDiv);
 			continue;
 		}
 
 		myCreateCountry(i);
 	}
-	show1stSwalPopup();
+	show2ndSwalPopup();
 	btnRank.style.display = "inline";
 	btnTop10.style.display = "inline";
 
-	console.log(ms = performance.now() - ms);
-	duration.innerText = `In ${ms.toFixed(1)} ms`;
+	console.log(`Generated in ${(performance.now() - ms).toFixed(1)} ms`);
 }
 
 function healthyAdvice() {
@@ -728,9 +758,9 @@ const INTERVAL_DURATION = 10 * 60 * 1000;
 // Erstellen einer Funktion, die das erste Interval-Set auslöst
 function setFirstInterval() {
 	setTimeout(() => {
-		showFacts();
-		itv1 = setInterval(showFacts, INTERVAL_DURATION);
+		showFact();
+		itv1 = setInterval(showFact, INTERVAL_DURATION);
 	}, INTERVAL_DURATION - (Date.now() % INTERVAL_DURATION));
 }
 
-setFirstInterval();
+// setFirstInterval();

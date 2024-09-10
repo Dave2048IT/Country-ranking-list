@@ -7,9 +7,8 @@
 		<link rel="stylesheet" type="text/css" href="css/style.css">
 		<link rel="stylesheet" type="text/css" href="css/rating.css">
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.css">
-		<link rel="preload" href="https://pluspng.com/img-png/png-eighth-note-isolated-eight-note-png-512.png" as="image">
+		<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/zeroclipboard/2.3.0/ZeroClipboard.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js"></script>
 	</head>
 	<body>
@@ -18,29 +17,18 @@
 				<h3>Please use a good Browser or download "HTML Viewer Q" to use JavaScript</h3>
 			</div>
 		</noscript>
-		<h1>Your own
-		<br>Country ranking list 😉</h1>
+		<h1>Choose the country you represent.</h1>
 		
 		<p>Local Storage:</p>
 		<div id="storage_btns">
 			<button type="button" onclick="loadScores()">Load</button>
 			<button type="button" onclick="saveScores()">Save</button>
 			<button type="button" onclick="resetScores()">Reset</button>
-			<button type="button" onclick="randomPoints()">A secret?</button>
+			<button type="button" onclick="randomPoints()">Randomize</button>
 		</div>
-		<br><div>All resources were fully loaded in <span id="reqMS">---</span> ms</div>
-		<br><div>Download-Speed from CDN: <span id="downMb">---</span> Mbit/s</div>
-		
-		<br>After rating all songs, the points will be ranked automatically,
-		<br>so it doesn't matter whether you give a song 12 or 100 points,
-		<br>the song with the highest points will be at <span id="no1">#1</span> and so on. ;-)
 		<hr>
 		<div id="selectArea">
-			<select id="selectNumber">
-				<option value="0">Choose your Country</option>
-			</select>
-			<button id="btnGen" onclick="generateCountries()">Generate Countries</button>
-			<br><br><br><br><br><br><br>
+			<div id="flagSelection"></div>
 			<hr>
 		</div>
 		<div id="myMenu"></div>
@@ -83,9 +71,8 @@
 		<p>Provided by countryflags.com - part of ProFlags BV</p>
 		Coded and designed by <br>David Schüppel @ 27.02. - 05.03.2023
 		<br><br>UI Design advised by <br>Lukas Klemm @ 29.03.2024
-		<br><br>Last Update: 10.08.2024, 09:45:00
+		<br><br>Last Update: 01.09.2024, 15:35:00
 
-		<script src="js/countries.js"></script>
 		<script src="js/showFacts.js"></script>
 		<script src="js/script.js"></script>
 	</body>
