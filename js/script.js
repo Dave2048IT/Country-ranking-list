@@ -31,15 +31,16 @@ function rankCountries(op = 1) {
 	if (op === 2)
 		return countries;
 
-	const len = countries.length;
 	const original = [...countries];
+
+	// Points assigned for each rank (1st to 10th place)
+	const POINTS_FOR_RANK = [12, 10, 8, 7, 6, 5, 4, 3, 2, 1];
 
 	const rankedCountries = countries
 		.sort((a, b) => b.score - a.score)
 		.slice(0, 12)
 		.map(({ name, score }, i) =>
-		`<span>${i + 1}<sup>${getOrdinal(i + 1)}</sup> : ${name} → ${i < 7 ? [12, 8, 6, 4, 3, 2, 1][i] : 0} P.</span>`
-		// ${i < 10 ? `${[12, 10, 8, 7, 6, 5, 4, 3, 2, 1][i]}` : 0}
+		`<span>${i + 1}<sup>${getOrdinal(i + 1)}</sup> : ${name} → ${i < POINTS_FOR_RANK.length ? POINTS_FOR_RANK[i] : 0} P.</span>`
 	);
 
 	let idx = 0;
@@ -71,7 +72,7 @@ function rankCountries(op = 1) {
 		idx = -1;
 	}
 
-	if (idx != -1 && countries[len - 2].score === 0) {
+	if (idx != -1 && countries[countryCount - 2].score === 0) {
 		Swal.fire({
 		title: "Please give points to all countries except yours.",
 		icon: "warning",
