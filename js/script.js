@@ -43,44 +43,41 @@ function rankCountries(op = 1) {
 		`<span>${i + 1}<sup>${getOrdinal(i + 1)}</sup> : ${name} → ${i < POINTS_FOR_RANK.length ? POINTS_FOR_RANK[i] : 0} P.</span>`
 	);
 
-	let idx = 0;
-	let ctry = null;
+	let errorIndex = -1;
 	let sumOfScores = 0;
 
 	try {
-		sumOfScores = rankedCountries.reduce(
-			(accumulator, currentValue) => {
-				ctry = countries[idx++];
-				const score = currentValue.match(/\((-?\d+)\)/)[1];
-				return accumulator + parseInt(score);
-			},
-			0 // initial value for accumulator
-		);
-		rankedCountries.splice(12, 0, null);
-	} catch (error) {
-		Swal.fire({
-			title: "Oooh... A rare error!",
-			icon: "error",
-			text: 'It seems that one of your scores is empty. '+
-				'If you see NaN, it means: Not a Number.',
-			footer: `At ${ctry.name} -> ${ctry.score}`,
-			background: "indianred",
-			didOpen: () => {
-				document.querySelector(".swal2-title").style.color = "white";
-			},
-		});
-		idx = -1;
-	}
+		sumOfScores = countries.reduce((acc, c, i) => {
+			const score = Number(c.score); // Slider -> string => number
+			if (Number.isNaN(score)) {
+				errorIndex = i;                   // Fehler-Index setzen
+				throw new Error('Invalid score'); // Abbruch; wird unten im catch behandelt
+			}
+			return acc + score;
+		}, 0);
 
-	if (idx != -1 && countries[countryCount - 2].score === 0) {
+		rankedCountries.splice(12, 0, null);
+
+		// numerische Prüfung (falls du prüfen willst, ob das vorletzte Land 0 hat)
+		if (errorIndex === -1 && Number(countries[countryCount - 2]?.score) === 0) {
+			Swal.fire({
+				title: "Please give points to all countries except yours.",
+				icon: "warning",
+				background: "darkgoldenrod",
+				didOpen: () => { document.querySelector(".swal2-title").style.color = "white"; },
+			});
+		}
+	} catch (err) {
+		// zentrale Fehlerbehandlung / Meldung
 		Swal.fire({
-		title: "Please give points to all countries except yours.",
-		icon: "warning",
-		background: "darkgoldenrod",
-		didOpen: () => {
-			document.querySelector(".swal2-title").style.color = "white";
-		},
+			title: 'Oooh... A rare error!',
+			icon: 'error',
+			text: 'Score is invalid.',
+			footer: `At ${countries[errorIndex]?.name ?? 'unknown'} -> ${String(countries[errorIndex]?.score)}`,
+			background: 'indianred',
+			didOpen: () => { document.querySelector('.swal2-title').style.color = 'white'; },
 		});
+		// optional: weitere Fehler-Logik hier (return/abort)
 	}
 
 	const duplicatesText = findDuplicateIndexes(original);
@@ -752,16 +749,3 @@ function factsToArray(facts) {
 	console.log(output);
 	return output;
 }
-
-var itv1 = null;
-const INTERVAL_DURATION = 10 * 60 * 1000;
-
-// Erstellen einer Funktion, die das erste Interval-Set auslöst
-function setFirstInterval() {
-	setTimeout(() => {
-		showFact();
-		itv1 = setInterval(showFact, INTERVAL_DURATION);
-	}, INTERVAL_DURATION - (Date.now() % INTERVAL_DURATION));
-}
-
-// setFirstInterval();
