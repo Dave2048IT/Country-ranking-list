@@ -1,4 +1,4 @@
-let factsCount = -1;
+let factsCount = 0;
 var countries = ["United Kingdom","Sweden","Norway","United States of America","France","Denmark","Germany","Estonia","Puerto Rico","Japan","Mali","Spain"];
 
 if (/Windows|Macintosh|Linux/.test(navigator.userAgent)) {
@@ -24,6 +24,7 @@ function validateCountryFacts(countries) {
     }
 
     // Gibt bei einem Test → Object.keys(facts) zurück.
+    factsCount--;
     const factCountries = showFact(countries[0], 0);
     const missingCountries = factCountries.filter(country => !countries.includes(country));
 
