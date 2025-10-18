@@ -1,5 +1,5 @@
-let factsCount = 0;
-var countries = ["Japan","Spain","Puerto Rico","Estonia","Mali","Germany","France","Denmark","United States of America","Norway","Sweden","United Kingdom"];
+let factsCount = -1;
+var countries = ["United Kingdom","Sweden","Norway","United States of America","France","Denmark","Germany","Estonia","Puerto Rico","Japan","Mali","Spain"];
 
 if (/Windows|Macintosh|Linux/.test(navigator.userAgent)) {
     validateCountryFacts(countries);
