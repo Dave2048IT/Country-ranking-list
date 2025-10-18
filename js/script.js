@@ -400,7 +400,7 @@ function copyTextWithCustomModal(text) {
 		Swal.fire({
 			icon: "success",
 			title: "1st Workaround -> Successful!",
-			text: `Top ${topCountries} was copied. Now you can send it to Franz ;-)`,
+			text: `Top ${topCountries} was copied. Now you can send it to Steven ;-)`,
 			confirmButtonText: "OK",
 			didOpen: setPopupStyle("green")
 		});
@@ -449,7 +449,7 @@ function copyToClipboard() {
 		.then(() => {
 			Swal.fire({
 			title: "Success!",
-			text: `Top ${topCountries} was copied. Now you can send it to Franz ;-)`,
+			text: `Top ${topCountries} was copied. Now you can send it to Steven ;-)`,
 			icon: "success",
 			didOpen: setPopupStyle("green")
 			});
