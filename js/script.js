@@ -483,7 +483,7 @@ function copyToClipboard() {
 const rankingEl = document.querySelector('#ranking');
 
 let countryCount = countries.length;
-let topCountries = Math.min(countryCount - 1, 12);
+let topCountries = Math.min(countryCount - 1, 10);
 
 if (!navigator.onLine)
 	alert("Sorry, without internet you can't use the page, because I built in libraries to make the whole page more beautiful. ;-)");
