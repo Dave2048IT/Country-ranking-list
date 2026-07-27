@@ -400,7 +400,7 @@ function copyTextWithCustomModal(text) {
 		Swal.fire({
 			icon: "success",
 			title: "1st Workaround -> Successful!",
-			text: `Top ${topCountries} was copied. Now you can send it to Steven ;-)`,
+			text: `Top ${topCountries} was copied. Now you can send it to Franz ;-)`,
 			confirmButtonText: "OK",
 			didOpen: setPopupStyle("green")
 		});
@@ -437,7 +437,7 @@ function copyToClipboard() {
 		return;
 	}
 
-	let textToCopy = `My Country is: ${selected_ctry}\n\n${rankingText.split('13th')[0].trim()}\n\n`
+	let textToCopy = `My Country is: ${selected_ctry}\n\n${rankingText.split('11th')[0].trim()}\n\n`
 	if (ratingShow.value - 0)
 		textToCopy += `I gave the Show: ${ratingShow.value} / 5 Stars.\n`;
 	
@@ -449,7 +449,7 @@ function copyToClipboard() {
 		.then(() => {
 			Swal.fire({
 			title: "Success!",
-			text: `Top ${topCountries} was copied. Now you can send it to Steven ;-)`,
+			text: `Top ${topCountries} was copied. Now you can send it to Franz ;-)`,
 			icon: "success",
 			didOpen: setPopupStyle("green")
 			});

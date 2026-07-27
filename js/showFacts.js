@@ -1,5 +1,5 @@
 let factsCount = 0;
-var countries = ["United Kingdom","Sweden","Norway","United States of America","France","Denmark","Germany","Estonia","Puerto Rico","Japan","Mali","Spain"];
+var countries = ["Netherlands", "Germany", "Sweden", "China", "Canada", "USA", "Brazil", "Spain", "Italy", "Switzerland", "France", "United Kingdom"];
 
 if (/Windows|Macintosh|Linux/.test(navigator.userAgent)) {
     validateCountryFacts(countries);
@@ -44,53 +44,53 @@ function validateCountryFacts(countries) {
 function showFact(country, index) {
     // Definiere die Fakten direkt in der Funktion
     const facts = {
-        "Japan": [
-            { q: "Japan’s pop culture powerhouse — J-Pop, anime soundtracks, and idol groups — has shaped global music tastes and created exportable pop aesthetics." },
-            { q: "Not eligible for Eurovision, Japan instead shines through huge music festivals, anime music fame, and internationally loved artists and producers." }
+        "Netherlands": [
+            { q: "The Netherlands is known for producing world-famous DJs such as Armin van Buuren, Martin Garrix, and Tiësto, making it one of the biggest electronic music hubs in the world." },
+            { q: "Dutch artists have achieved remarkable Eurovision success, with the country winning the contest multiple times and consistently delivering memorable performances." }
+        ],
+        "Germany": [
+            { q: "Germany is home to legendary composers like Beethoven and Bach, while also leading modern genres such as electronic music, metal, and techno." },
+            { q: "Berlin is considered one of the world's electronic music capitals, attracting DJs and music fans from across the globe." }
+        ],
+        "Sweden": [
+            { q: "Sweden is one of the world's largest exporters of pop music, producing global stars like ABBA, Zara Larsson, and countless hit songwriters." },
+            { q: "Many international chart hits have been written or produced by Swedish songwriters, giving the country an outsized influence on modern pop." }
+        ],
+        "China": [
+            { q: "China's music scene combines thousands of years of traditional instruments with a rapidly growing modern pop industry." },
+            { q: "Although not part of Eurovision, Chinese artists are gaining international attention through streaming platforms and global collaborations." }
+        ],
+        "Canada": [
+            { q: "Canada has produced global superstars including Celine Dion, Justin Bieber, The Weeknd, and Drake." },
+            { q: "The country is known for its diversity, which has helped shape a music scene spanning pop, rock, hip-hop, country, and electronic music." }
+        ],
+        "USA": [
+            { q: "The United States is the birthplace of influential genres such as jazz, blues, rock 'n' roll, hip-hop, and country music." },
+            { q: "American artists and producers continue to dominate global music charts and shape worldwide music trends." }
+        ],
+        "Brazil": [
+            { q: "Brazil is famous for vibrant musical styles like samba and bossa nova, which have influenced musicians around the world." },
+            { q: "Music plays a central role in Brazilian culture, especially during Carnival, one of the world's biggest musical celebrations." }
         ],
         "Spain": [
             { q: "Spain has a long Eurovision history and a strong pop tradition that blends flamenco, Latin rhythms, and contemporary pop production." },
             { q: "Spanish-language music — from flamenco virtuosity to modern pop and indie scenes — regularly influences trends across Europe and Latin America." }
         ],
-        "Puerto Rico": [
-            { q: "Puerto Rico is a global hotspot for Caribbean genres — salsa, reggaetón and Latin trap — and has produced artists who reshaped contemporary Latin pop." },
-            { q: "Puerto Rico does not compete in Eurovision; its musical impact is felt worldwide through chart-topping Latin hits and influential producers." }
+        "Italy": [
+            { q: "Italy's Sanremo Music Festival inspired the creation of the Eurovision Song Contest and remains one of Europe's most prestigious music competitions." },
+            { q: "Italian music blends classical heritage with modern pop, opera, rock, and internationally successful artists." }
         ],
-        "Estonia": [
-            { q: "Estonia punches above its weight in Eurovision and modern pop — the country mixes Baltic folk colors with polished pop production." },
-            { q: "A vibrant electronic and choral tradition gives Estonia a distinctive soundscape that often translates well to international song contests." }
-        ],
-        "Mali": [
-            { q: "Mali is famed for its rich musical heritage — the kora, desert blues, and melodic traditions have inspired global world-music audiences." },
-            { q: "While not part of Eurovision, Mali’s musicians have achieved international acclaim and heavily influenced guitar-based and folk fusion genres." }
-        ],
-        "Germany": [
-            { q: "Germany combines a huge pop and electronic scene with a long Eurovision presence — from schlager and pop to pioneering electronic music." },
-            { q: "Germany’s music industry is influential in Europe, producing successful pop acts and a thriving club/electronic culture that shapes dance music globally." }
+        "Switzerland": [
+            { q: "Switzerland hosted the very first Eurovision Song Contest in 1956 and remains an important part of Eurovision history." },
+            { q: "Its multilingual culture inspires a diverse music scene spanning German, French, Italian, and Romansh influences." }
         ],
         "France": [
-            { q: "France’s chanson tradition and contemporary pop/hip-hop scenes coexist — French songwriting and production have a distinct lyrical and stylistic identity." },
-            { q: "France participates actively in Eurovision and also exports influential pop, electronic and world-music producers and artists." }
-        ],
-        "Denmark": [
-            { q: "Denmark has a strong pop and indie output and a notable Eurovision track record, often emphasizing catchy, well-crafted songs." },
-            { q: "Danish producers and songwriters are prominent in Scandinavian pop circles, contributing polished productions across Europe." }
-        ],
-        "United States of America": [
-            { q: "The USA is not a Eurovision participant, but it is the global epicenter of many genres — jazz, rock, hip-hop, R&B, pop — shaping worldwide music culture." },
-            { q: "American record labels, producers, and streaming trends heavily influence global pop production and the international music business." }
-        ],
-        "Norway": [
-            { q: "Norway blends Nordic folk influences with modern pop and electronic music and has cultivated memorable Eurovision entries." },
-            { q: "Norwegian songwriters and producers are sought after internationally for their melodic sensibility and polished pop craftsmanship." }
-        ],
-        "Sweden": [
-            { q: "Sweden is a Eurovision powerhouse and global pop factory — from ABBA’s legacy to contemporary hitmakers, it consistently produces memorable, catchy songs." },
-            { q: "Swedish songwriters and producers (a tiny but prolific industry) have written mega-hits worldwide, making Sweden hugely influential in global pop." }
+            { q: "France is internationally celebrated for chanson, electronic music, and influential artists across many generations." },
+            { q: "French producers and DJs have helped shape modern electronic music, with acts like Daft Punk achieving worldwide success." }
         ],
         "United Kingdom": [
-            { q: "The UK has a long and storied Eurovision history and a massive pop legacy — from iconic rock bands to chart-dominating pop stars." },
-            { q: "British music scenes (pop, rock, electronic) and songwriting traditions have shaped global trends and continue to feed international charts." }
+            { q: "The United Kingdom has produced some of the most influential artists in history, including The Beatles, Queen, Adele, and Ed Sheeran." },
+            { q: "British music has played a defining role in the global evolution of rock, pop, punk, and electronic music." }
         ]
     };
 
